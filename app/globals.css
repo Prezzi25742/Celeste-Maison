@@ -1,26 +1,64 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
+/* 1. CUSTOM THEME SETTINGS (Tailwind v4 Style) */
+@theme {
+  /* This tells Tailwind to use the fonts we'll set up in layout.tsx */
+  --font-sans: var(--font-inter);
+  --font-serif: var(--font-playfair);
+
+  /* Custom Brand Colors */
+  --color-brand-brown: #5A4A42;
+  --color-brand-cream: #FDFBF7;
+  --color-brand-gold: #C4A052;
+  --color-brand-deep-purple: #7B0059; /* Purple from Lily's image */
+  --color-brand-vibrant-gold: #D4AF37; /* Gold from Lily's border */
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+@keyframes fade-in-left {
+  from {
+    opacity: 0;
+    transform: translateX(-30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
   }
 }
 
+.animate-fade-left {
+  animation: fade-in-left 1s ease-out forwards;
+}
+
+/* 2. GLOBAL STYLES */
+:root {
+  --background: #FDFBF7; /* That soft luxury cream */
+  --foreground: #5A4A42; /* The deep professional brown */
+}
+
 body {
-  background: var(--background);
+  background-color: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  /* Use the Serif font by default for that "official" feel */
+  font-family: var(--font-serif), serif;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* 3. INPUT FIXES (For your reservation form) */
+input[type="date"], input[type="time"] {
+  color-scheme: light; /* Ensures the calendar icon is visible on cream */
+}
+
+/* 4. FOOTER GOLD BORDER MOTIF */
+@layer utilities {
+  .border-dotted-gold::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 16px;
+    background-image: repeating-linear-gradient(90deg, #D4AF37 0px, #D4AF37 10px, transparent 10px, transparent 20px);
+    background-size: 20px 100%;
+    border-bottom: 2px solid transparent; /* Required for a base */
+  }
 }
