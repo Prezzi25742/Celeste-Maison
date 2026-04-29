@@ -36,37 +36,27 @@ export default function BookingPage() {
     return Object.keys(newErrors).length === 0;
   };
 
-  const handleBooking = async (e: any) => {
-  e.preventDefault();
-  const response = await fetch('/api/send', {
-    method: 'POST',
-    body: JSON.stringify({
-      email: formData.email,
-      name: formData.name,
-      address: formData.address,
-      date: formData.date,
-      time: formData.time,
-      massage: formData.massage,
-      people: formData.people // Include people in the email payload
-    }),
-  });
-
-  if (response.ok) {
-    alert("Check your email for confirmation!");
-  }
-};
-
-  // 3. ACTUAL SUBMIT LOGIC
+ // Combined Logic: Saves to Database AND Sends Email
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    
     if (validate()) {
       setIsSubmitting(true);
       
       try {
-        // This calls your server action in actions.ts
+        // 1. Save to Supabase (Server Action)
         const result = await handleBookingForm(formData);
 
         if (result.success) {
+          // 2. Send Email (API Route)
+          // We call this ONLY if the database save was successful
+          await fetch('/api/send', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(formData),
+          });
+
+          // 3. Success UI
           setIsSuccess(true);
           setFormData({ 
             name: "", 
@@ -75,22 +65,21 @@ export default function BookingPage() {
             date: "", 
             time: "", 
             massage: "", 
-            people:"",
+            people: "1", // Reset to "1", not ""
             addon: "" 
           });
         } else {
-          // If Supabase sends back an error (like RLS or column issues), show it here
           alert("Booking failed: " + result.error);
         }
       } catch (error) {
         console.error("Submission error:", error);
-        alert("A server error occurred. Check your internet connection.");
+        alert("A server error occurred.");
       } finally {
         setIsSubmitting(false);
       }
     }
   };
-
+  
   return (
     <main className="min-h-screen bg-[#5A4A42] py-24 px-6 flex flex-col items-center justify-center font-sans selection:bg-[#C4A052] selection:text-white">
       
