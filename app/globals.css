@@ -1,7 +1,7 @@
 @import url('https://fonts.googleapis.com/css2?family=Great+Vibes&display=swap');
 @import "tailwindcss";
 
-/* 1. GLOBAL RESET (Arial & Professional Spacing) */
+/* 1. GLOBAL RESET */
 body {
   background-color: #FDFBF7;
   color: #5A4A42;
@@ -9,50 +9,67 @@ body {
   line-height: 1.5;
 }
 
-/* 2. THE NAV BAR LOGO (Making "Maison Celeste" Fancy) */
+/* 2. THE NAV BAR LOGO (Fancy Title) */
 header h1, 
 .logo-text {
   font-family: 'Great Vibes', cursive !important;
-  font-size: 3.5rem !important;
+  font-size: 3.2rem !important;
   font-weight: 400 !important;
-  color: #5A4A42 !important; /* Professional brown color */
+  color: #5A4A42 !important;
   text-transform: none !important;
-  letter-spacing: 0 !important;
+  text-align: center !important;
+  width: 100% !important; /* Forces logo to take full width so links move below */
+  margin-bottom: 5px !important;
 }
 
-/* 3. REVERTING THE GOLD TEXT (Arial & Professional) */
-/* This puts the "Massages at your home" back to exactly how it was */
+/* 3. GOLD SUBTITLE (Professional Arial) */
 header p, 
-.logo-subtitle,
-main p.gold-text {
+.logo-subtitle {
   font-family: Arial, sans-serif !important;
   color: #C4A052 !important;
   text-transform: uppercase !important;
-  font-size: 0.8rem !important;
+  font-size: 0.75rem !important;
   letter-spacing: 0.15rem !important;
-  font-style: normal !important; /* Removes any accidental calligraphy */
+  text-align: center !important;
+  width: 100% !important;
+  margin-bottom: 15px !important;
 }
 
-/* 4. THE WELCOME TITLE (Bold & Professional) */
+/* 4. MOBILE NAVIGATION (The Stacking Fix) */
+header nav {
+  display: flex !important;
+  flex-direction: column !important; /* This forces the STACKING */
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 12px !important;
+  width: 100% !important;
+  padding: 20px 10px !important;
+}
+
+/* Make nav links look clean while stacked */
+header nav a {
+  font-family: Arial, sans-serif !important;
+  font-weight: bold;
+  text-transform: uppercase;
+  font-size: 0.9rem;
+  letter-spacing: 1px;
+  text-decoration: none;
+  color: inherit;
+}
+
+/* 5. WELCOME & MOBILE OVERFLOW */
 main h1 {
   font-family: Arial, sans-serif !important;
   font-weight: 900 !important;
-  font-size: 2.8rem !important;
+  font-size: 2.5rem !important;
   text-align: center;
 }
 
-/* 5. MOBILE OVERFLOW & NAV FIXES */
 html, body {
   max-width: 100vw;
   overflow-x: hidden;
 }
 
-header nav {
-  display: flex !important;
-  flex-wrap: wrap !important;
-  justify-content: center !important;
-  align-items: center !important;
-  gap: 15px !important;
-  width: 100% !important;
-  padding: 10px !important;
+* {
+  box-sizing: border-box;
 }
