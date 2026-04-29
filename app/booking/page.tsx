@@ -3,27 +3,37 @@
 import { useState } from "react";
 import Link from "next/link";
 import { Check, AlertCircle } from "lucide-react"; 
-import { handleBookingForm } from "@/app/actions"; // 1. Ensure this path is correct
+import { handleBookingForm } from "@/app/actions"; 
+
+// 1. THIS IS THE MISSING PIECE: Define the structure of your form data
+interface BookingData {
+  name: string;
+  email: string;
+  address: string;
+  date: string;
+  time: string;
+  massage: string;
+  addon: string;
+  people: string;
+}
 
 export default function BookingPage() {
-  // 1. FORM STATE
- const [formData, setFormData] = useState({
-  name: "",
-  email: "",
-  address: "",
-  date: "",
-  time: "",
-  massage: "",
-  addon: "",
-  people: "1", // Initial value set to 1
-});
-const today = new Date().toISOString().split('T')[0];
-
+  // 2. State now knows exactly what fields to expect
+  const [formData, setFormData] = useState<BookingData>({
+    name: "",
+    email: "",
+    address: "",
+    date: "",
+    time: "",
+    massage: "",
+    addon: "",
+    people: "1",
+  });
+  const today = new Date().toISOString().split('T')[0];
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
 
-  // 2. VALIDATION LOGIC
   const validate = () => {
     let newErrors: { [key: string]: string } = {};
     if (!formData.name) newErrors.name = "Name is required";
@@ -37,7 +47,6 @@ const today = new Date().toISOString().split('T')[0];
     return Object.keys(newErrors).length === 0;
   };
 
- // Combined Logic: Saves to Database AND Sends Email
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
@@ -45,32 +54,23 @@ const today = new Date().toISOString().split('T')[0];
       setIsSubmitting(true);
       
       try {
-        // 1. Save to Supabase (Server Action)
         const result = await handleBookingForm(formData);
 
-        if (result.success) {
-          // 2. Send Email (API Route)
-          // We call this ONLY if the database save was successful
+        if (result && result.success) {
+          // Send Email
           await fetch('/api/send', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(formData),
           });
 
-          // 3. Success UI
           setIsSuccess(true);
           setFormData({ 
-            name: "", 
-            email: "", 
-            address: "", 
-            date: "", 
-            time: "", 
-            massage: "", 
-            people: "1", // Reset to "1", not ""
-            addon: "" 
+            name: "", email: "", address: "", date: "", 
+            time: "", massage: "", people: "1", addon: "" 
           });
         } else {
-          alert("Booking failed: " + result.error);
+          alert("Booking failed: " + (result?.error || "Unknown error"));
         }
       } catch (error) {
         console.error("Submission error:", error);
