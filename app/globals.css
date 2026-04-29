@@ -1,72 +1,31 @@
-@import url('https://fonts.googleapis.com/css2?family=Great+Vibes&display=swap');
-@import "tailwindcss";
+"use client";
+import { useState } from "react";
+import Link from "next/link";
 
-/* 1. GLOBAL RESET */
-body {
-  background-color: #FDFBF7;
-  color: #5A4A42;
-  font-family: Arial, sans-serif !important;
-  line-height: 1.5;
-}
+export default function Navbar() {
+  const [isOpen, setIsOpen] = useState(false);
 
-/* 2. THE FANCY TITLE (Always fancy) */
-header h1, 
-.logo-text {
-  font-family: 'Great Vibes', cursive !important;
-  font-size: 3.2rem !important;
-  font-weight: 400 !important;
-  color: #5A4A42 !important;
-  text-transform: none !important;
-  text-align: center !important;
-  width: 100% !important;
-}
+  return (
+    <header className="header-container">
+      <div className="logo-section">
+        <h1 className="logo-text">Maison Celeste</h1>
+        <p className="logo-subtitle">Massages at your home</p>
+      </div>
 
-/* 3. GOLD SUBTITLE (Arial) */
-header p, 
-.logo-subtitle {
-  font-family: Arial, sans-serif !important;
-  color: #C4A052 !important;
-  text-transform: uppercase !important;
-  font-size: 0.75rem !important;
-  letter-spacing: 0.15rem !important;
-  text-align: center !important;
-  width: 100% !important;
-}
+      {/* Hamburger button with 3 lines */}
+      <button className="hamburger" onClick={() => setIsOpen(!isOpen)}>
+        <span className="line"></span>
+        <span className="line"></span>
+        <span className="line"></span>
+      </button>
 
-/* 4. THE NAVIGATION (Desktop Default) */
-header nav {
-  display: flex !important;
-  flex-direction: row; /* Side by side on desktop */
-  align-items: center !important;
-  justify-content: center !important;
-  gap: 20px !important;
-  width: 100% !important;
-  padding: 10px !important;
-}
-
-/* 5. MOBILE-ONLY STACKING FIX (The part you need) */
-/* This kicks in when the screen is smaller than 768px (tablets and phones) */
-@media (max-width: 768px) {
-  header nav {
-    flex-direction: column !important; /* Forces the vertical stack */
-    gap: 15px !important;
-    padding: 20px 0 !important;
-  }
-
-  header nav a {
-    width: 100%;
-    text-align: center;
-    font-size: 1.1rem !important; /* Slightly larger for easier tapping */
-    font-weight: bold !important;
-  }
-}
-
-/* 6. UTILITIES */
-html, body {
-  max-width: 100vw;
-  overflow-x: hidden;
-}
-
-* {
-  box-sizing: border-box;
+      {/* The 'active' class only applies when isOpen is true */}
+     <nav className={`nav-links ${isOpen ? "active" : ""}`}>
+        <Link href="/" onClick={() => setIsOpen(false)}>Home</Link>
+        <Link href="/services" onClick={() => setIsOpen(false)}>Services</Link>
+        <Link href="/booking" onClick={() => setIsOpen(false)}>Booking</Link>
+        <Link href="/contact" onClick={() => setIsOpen(false)}>Contact</Link>
+      </nav>
+    </header>
+  );
 }
