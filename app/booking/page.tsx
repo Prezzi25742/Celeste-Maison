@@ -36,7 +36,7 @@ export default function BookingPage() {
     return Object.keys(newErrors).length === 0;
   };
 
-  const handleBooking = async (e) => {
+  const handleBooking = async (e: any) => {
   e.preventDefault();
   const response = await fetch('/api/send', {
     method: 'POST',

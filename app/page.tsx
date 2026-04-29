@@ -6,7 +6,7 @@ import { Check, Info, Target, ChevronDown, ChevronUp, AlertCircle, ChevronLeft, 
 /**
  * REUSABLE ANIMATION COMPONENT
  */
-function FadeInSection({ children, delay = "0s", direction = "left" }: { children: React.ReactNode, delay?: string, direction?: "left" | "right" }) {
+function FadeInSection({ children, delay = "0s", direction = "up" }: { children: React.ReactNode, delay?: string, direction?: "left" | "right" | "up" | "down" }) {
   const [isVisible, setIsVisible] = useState(false);
   const domRef = useRef<HTMLDivElement>(null);
 
