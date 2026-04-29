@@ -55,7 +55,7 @@ export async function handleBookingForm(data: any) {
       subject: `Booking Confirmed - Maison Celeste`,
       html: `
         <h1>Hi ${data.name},</h1>
-        <p>Your ritual at Maison Celeste is confirmed!</p>
+        <p>Your ritual at Maison Celeste has been recieved!</p>
         <p><strong>Details:</strong></p>
         <ul>
           <li>Date: ${data.date}</li>
@@ -63,7 +63,7 @@ export async function handleBookingForm(data: any) {
           <li>Ritual: ${data.massage}</li>
           <li>Add-on: ${data.addon || "None"}</li>
         </ul>
-        <p>We look forward to seeing you at ${data.address}.</p>
+        <p>We will later confirm your appointment once we process your details .</p>
       `,
     });
 
