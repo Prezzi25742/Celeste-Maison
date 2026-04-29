@@ -17,6 +17,7 @@ export default function BookingPage() {
   addon: "",
   people: "1", // Initial value set to 1
 });
+const today = new Date().toISOString().split('T')[0];
 
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -204,16 +205,41 @@ export default function BookingPage() {
               </div>
 
               {/* Date & Time Row */}
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+<div className="grid grid-cols-1 md:grid-cols-3 gap-6">
   <div>
-    <label className="block text-[10px] uppercase tracking-widest text-[#5A4A42] mb-2 font-semibold">Date</label>
+    <label className="block text-[10px] uppercase tracking-widest text-[#5A4A42] mb-2 font-semibold">
+      Date
+    </label>
     <input 
       type="date"
+      /* min={today} prevents them from picking a past date in the calendar */
+      min={new Date().toISOString().split('T')[0]} 
       className={`w-full border-b ${errors.date ? 'border-red-400' : 'border-[#5A4A42]/20'} py-2 focus:border-[#C4A052] outline-none text-sm bg-transparent text-[#5A4A42] cursor-pointer`}
       value={formData.date}
-      onChange={(e) => setFormData({...formData, date: e.target.value})}
+      onChange={(e) => {
+        const selectedDate = e.target.value;
+        const today = new Date().toISOString().split('T')[0];
+        
+        // Manual validation check
+        if (selectedDate < today) {
+          setErrors({ ...errors, date: "Please select a future date" });
+        } else {
+          const newErrors = { ...errors };
+          delete newErrors.date;
+          setErrors(newErrors);
+        }
+        
+        setFormData({...formData, date: selectedDate});
+      }}
     />
+    {/* Error Message Display */}
+    {errors.date && (
+      <p className="text-red-400 text-[10px] mt-1 uppercase tracking-tighter">
+        {errors.date}
+      </p>
+    )}
   </div>
+
 
   <div>
     <label className="block text-[10px] uppercase tracking-widest text-[#5A4A42] mb-2 font-semibold">Guests</label>
