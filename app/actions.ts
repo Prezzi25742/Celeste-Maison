@@ -38,7 +38,7 @@ export async function handleBookingForm(data: BookingData): Promise<ActionRespon
           time_preference: data.time,
           massage_type: data.massage,
           addon: data.addon || "None",
-          guests: data.people,
+          people: data.people,
         },
       ]);
 
