@@ -24,7 +24,7 @@ export async function handleBookingForm(data: any) {
       },
     });
 
-    // 1. SAVE TO SUPABASE (Mapping exactly to your column names)
+    // 1. SAVE TO DATABASE
     const { error: dbError } = await supabase.from("bookings").insert([
       {
         full_name: data.name,
@@ -34,39 +34,42 @@ export async function handleBookingForm(data: any) {
         ritual: data.massage,
         time_pref: data.time,
         people: data.people,
-        addon: data.addon || "None", // This fixes the NULL issue
+        addon: data.addon || "None",
       },
     ]);
 
-    if (dbError) throw new Error(`Database Error: ${dbError.message}`);
+    if (dbError) throw new Error(dbError.message);
 
-    // 2. SEND TO OUTLOOK (Using your verified domain)
-    const { error: emailError } = await resend.emails.send({
-      from: 'Bookings <bookings@maisoncelestelimerick.com>', 
+    // 2. SEND NOTIFICATION TO YOU (Outlook)
+    await resend.emails.send({
+      from: 'Maison Celeste <bookings@maisoncelestelimerick.com>',
       to: 'maisonceleste@outlook.ie',
       subject: `✨ New Booking: ${data.name}`,
+      html: `<p>You have a new booking for <strong>${data.massage}</strong> on ${data.date} at ${data.time}.</p>`,
+    });
+
+    // 3. SEND CONFIRMATION TO CUSTOMER
+    await resend.emails.send({
+      from: 'Maison Celeste <bookings@maisoncelestelimerick.com>',
+      to: data.email, // This sends to the customer's email address
+      subject: `Booking Confirmed - Maison Celeste`,
       html: `
-        <div style="font-family: sans-serif; line-height: 1.5;">
-          <h2>New Booking for Maison Celeste</h2>
-          <hr />
-          <p><strong>Customer:</strong> ${data.name}</p>
-          <p><strong>Email:</strong> ${data.email}</p>
-          <p><strong>Address:</strong> ${data.address}</p>
-          <p><strong>Ritual:</strong> ${data.massage}</p>
-          <p><strong>Add-on:</strong> ${data.addon || "None"}</p>
-          <p><strong>Date:</strong> ${data.date}</p>
-          <p><strong>Time:</strong> ${data.time}</p>
-          <p><strong>Guests:</strong> ${data.people}</p>
-        </div>
+        <h1>Hi ${data.name},</h1>
+        <p>Your ritual at Maison Celeste is confirmed!</p>
+        <p><strong>Details:</strong></p>
+        <ul>
+          <li>Date: ${data.date}</li>
+          <li>Time: ${data.time}</li>
+          <li>Ritual: ${data.massage}</li>
+          <li>Add-on: ${data.addon || "None"}</li>
+        </ul>
+        <p>We look forward to seeing you at ${data.address}.</p>
       `,
     });
 
-    if (emailError) console.error("Email failed:", emailError);
-
     return { success: true };
-
   } catch (err: any) {
-    console.error("Critical Error:", err.message);
+    console.error("Fatal Error:", err.message);
     return { success: false, error: err.message };
   }
 }
