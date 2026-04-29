@@ -3,26 +3,37 @@
 import { useState } from "react";
 import Link from "next/link";
 import { Check, AlertCircle } from "lucide-react"; 
-import { handleBookingForm } from "@/app/actions"; // 1. Ensure this path is correct
+import { handleBookingForm } from "@/app/actions"; 
+
+// 1. THIS IS THE MISSING PIECE: Define the structure of your form data
+interface BookingData {
+  name: string;
+  email: string;
+  address: string;
+  date: string;
+  time: string;
+  massage: string;
+  addon: string;
+  people: string;
+}
 
 export default function BookingPage() {
-  // 1. FORM STATE
- const [formData, setFormData] = useState({
-  name: "",
-  email: "",
-  address: "",
-  date: "",
-  time: "",
-  massage: "",
-  addon: "",
-  people: "1", // Initial value set to 1
-});
-
+  // 2. State now knows exactly what fields to expect
+  const [formData, setFormData] = useState<BookingData>({
+    name: "",
+    email: "",
+    address: "",
+    date: "",
+    time: "",
+    massage: "",
+    addon: "",
+    people: "1",
+  });
+  const today = new Date().toISOString().split('T')[0];
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
 
-  // 2. VALIDATION LOGIC
   const validate = () => {
     let newErrors: { [key: string]: string } = {};
     if (!formData.name) newErrors.name = "Name is required";
@@ -36,61 +47,40 @@ export default function BookingPage() {
     return Object.keys(newErrors).length === 0;
   };
 
-  const handleBooking = async (e: any) => {
-  e.preventDefault();
-  const response = await fetch('/api/send', {
-    method: 'POST',
-    body: JSON.stringify({
-      email: formData.email,
-      name: formData.name,
-      address: formData.address,
-      date: formData.date,
-      time: formData.time,
-      massage: formData.massage,
-      people: formData.people // Include people in the email payload
-    }),
-  });
-
-  if (response.ok) {
-    alert("Check your email for confirmation!");
-  }
-};
-
-  // 3. ACTUAL SUBMIT LOGIC
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    
     if (validate()) {
       setIsSubmitting(true);
       
       try {
-        // This calls your server action in actions.ts
         const result = await handleBookingForm(formData);
 
-        if (result.success) {
+        if (result && result.success) {
+          // Send Email
+          await fetch('/api/send', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(formData),
+          });
+
           setIsSuccess(true);
           setFormData({ 
-            name: "", 
-            email: "", 
-            address: "", 
-            date: "", 
-            time: "", 
-            massage: "", 
-            people:"",
-            addon: "" 
+            name: "", email: "", address: "", date: "", 
+            time: "", massage: "", people: "1", addon: "" 
           });
         } else {
-          // If Supabase sends back an error (like RLS or column issues), show it here
-          alert("Booking failed: " + result.error);
+          alert("Booking failed: " + (result?.error || "Unknown error"));
         }
       } catch (error) {
         console.error("Submission error:", error);
-        alert("A server error occurred. Check your internet connection.");
+        alert("A server error occurred.");
       } finally {
         setIsSubmitting(false);
       }
     }
   };
-
+  
   return (
     <main className="min-h-screen bg-[#5A4A42] py-24 px-6 flex flex-col items-center justify-center font-sans selection:bg-[#C4A052] selection:text-white">
       
@@ -215,16 +205,41 @@ export default function BookingPage() {
               </div>
 
               {/* Date & Time Row */}
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+<div className="grid grid-cols-1 md:grid-cols-3 gap-6">
   <div>
-    <label className="block text-[10px] uppercase tracking-widest text-[#5A4A42] mb-2 font-semibold">Date</label>
+    <label className="block text-[10px] uppercase tracking-widest text-[#5A4A42] mb-2 font-semibold">
+      Date
+    </label>
     <input 
       type="date"
+      /* min={today} prevents them from picking a past date in the calendar */
+      min={new Date().toISOString().split('T')[0]} 
       className={`w-full border-b ${errors.date ? 'border-red-400' : 'border-[#5A4A42]/20'} py-2 focus:border-[#C4A052] outline-none text-sm bg-transparent text-[#5A4A42] cursor-pointer`}
       value={formData.date}
-      onChange={(e) => setFormData({...formData, date: e.target.value})}
+      onChange={(e) => {
+        const selectedDate = e.target.value;
+        const today = new Date().toISOString().split('T')[0];
+        
+        // Manual validation check
+        if (selectedDate < today) {
+          setErrors({ ...errors, date: "Please select a future date" });
+        } else {
+          const newErrors = { ...errors };
+          delete newErrors.date;
+          setErrors(newErrors);
+        }
+        
+        setFormData({...formData, date: selectedDate});
+      }}
     />
+    {/* Error Message Display */}
+    {errors.date && (
+      <p className="text-red-400 text-[10px] mt-1 uppercase tracking-tighter">
+        {errors.date}
+      </p>
+    )}
   </div>
+
 
   <div>
     <label className="block text-[10px] uppercase tracking-widest text-[#5A4A42] mb-2 font-semibold">Guests</label>
