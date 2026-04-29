@@ -41,6 +41,7 @@ export default function BookingPage() {
     if (!formData.massage) newErrors.massage = "Please select a massage ritual";
     if (!formData.address) newErrors.address = "Service address is required";
     if (!formData.date) newErrors.date = "Please select a date";
+    if (!formData.date) newErrors.date = "Please select a date";
     if (!formData.time) newErrors.time = "Please select a time preference";
     
     setErrors(newErrors);
