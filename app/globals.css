@@ -1,73 +1,58 @@
+@import url('https://fonts.googleapis.com/css2?family=Great+Vibes&display=swap');
 @import "tailwindcss";
 
-/* 1. CUSTOM THEME SETTINGS (Tailwind v4 Style) */
-@theme {
-  /* This tells Tailwind to use the fonts we'll set up in layout.tsx */
-  --font-sans: var(--font-inter);
-  --font-serif: var(--font-playfair);
-
-  /* Custom Brand Colors */
-  --color-brand-brown: #5A4A42;
-  --color-brand-cream: #FDFBF7;
-  --color-brand-gold: #C4A052;
-  --color-brand-deep-purple: #7B0059; /* Purple from Lily's image */
-  --color-brand-vibrant-gold: #D4AF37; /* Gold from Lily's border */
+/* 1. GLOBAL RESET (Arial & Professional Spacing) */
+body {
+  background-color: #FDFBF7;
+  color: #5A4A42;
+  font-family: Arial, sans-serif !important;
+  line-height: 1.5;
 }
 
-@keyframes fade-in-left {
-  from {
-    opacity: 0;
-    transform: translateX(-30px);
-  }
-  to {
-    opacity: 1;
-    transform: translateX(0);
-  }
+/* 2. THE NAV BAR LOGO (Making "Maison Celeste" Fancy) */
+header h1, 
+.logo-text {
+  font-family: 'Great Vibes', cursive !important;
+  font-size: 3.5rem !important;
+  font-weight: 400 !important;
+  color: #5A4A42 !important; /* Professional brown color */
+  text-transform: none !important;
+  letter-spacing: 0 !important;
 }
 
-.animate-fade-left {
-  animation: fade-in-left 1s ease-out forwards;
+/* 3. REVERTING THE GOLD TEXT (Arial & Professional) */
+/* This puts the "Massages at your home" back to exactly how it was */
+header p, 
+.logo-subtitle,
+main p.gold-text {
+  font-family: Arial, sans-serif !important;
+  color: #C4A052 !important;
+  text-transform: uppercase !important;
+  font-size: 0.8rem !important;
+  letter-spacing: 0.15rem !important;
+  font-style: normal !important; /* Removes any accidental calligraphy */
 }
 
-/* 2. GLOBAL STYLES */
-:root {
-  --background: #FDFBF7; /* That soft luxury cream */
-  --foreground: #5A4A42; /* The deep professional brown */
+/* 4. THE WELCOME TITLE (Bold & Professional) */
+main h1 {
+  font-family: Arial, sans-serif !important;
+  font-weight: 900 !important;
+  font-size: 2.8rem !important;
+  text-align: center;
 }
 
+/* 5. MOBILE OVERFLOW & NAV FIXES */
 html, body {
   max-width: 100vw;
   overflow-x: hidden;
 }
 
-* {
-  box-sizing: border-box;
-}
-
-body {
-  background-color: var(--background);
-  color: var(--foreground);
-  /* Use the Serif font by default for that "official" feel */
-  font-family: var(--font-serif), serif;
-  -webkit-font-smoothing: antialiased;
-}
-
-/* 3. INPUT FIXES (For your reservation form) */
-input[type="date"], input[type="time"] {
-  color-scheme: light; /* Ensures the calendar icon is visible on cream */
-}
-
-/* 4. FOOTER GOLD BORDER MOTIF */
-@layer utilities {
-  .border-dotted-gold::before {
-    content: "";
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    height: 16px;
-    background-image: repeating-linear-gradient(90deg, #D4AF37 0px, #D4AF37 10px, transparent 10px, transparent 20px);
-    background-size: 20px 100%;
-    border-bottom: 2px solid transparent; /* Required for a base */
-  }
+header nav {
+  display: flex !important;
+  flex-wrap: wrap !important;
+  justify-content: center !important;
+  align-items: center !important;
+  gap: 15px !important;
+  width: 100% !important;
+  padding: 10px !important;
 }
