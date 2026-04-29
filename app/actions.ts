@@ -1,88 +1,66 @@
 "use server";
 
-import { createClient } from "@/utils/supabase/server";
-import { Resend } from "resend"; // 1. Import Resend
+import { createServerClient } from "@supabase/ssr";
+import { cookies } from "next/headers";
 
-// 2. Initialize Resend with your API Key
-const resend = new Resend(process.env.RESEND_API_KEY);
-
-export interface BookingData {
+export type BookingData = {
   name: string;
   email: string;
   address: string;
   date: string;
   time: string;
   massage: string;
-  addon: string;
+  addon?: string;
   people: string;
-}
+};
 
-export interface ActionResponse {
-  success: boolean;
-  error?: string;
-}
-
-export async function handleBookingForm(data: BookingData): Promise<ActionResponse> {
+export async function handleBookingForm(data: BookingData) {
   try {
-    const supabase = await createClient();
+    const cookieStore = await cookies();
+    const supabase = createServerClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+      {
+        cookies: {
+          getAll() { return cookieStore.getAll(); },
+          setAll(cookiesToSet) {
+            try {
+              cookiesToSet.forEach(({ name, value, options }) =>
+                cookieStore.set(name, value, options)
+              );
+            } catch {}
+          },
+        },
+      }
+    );
 
-    // 3. STEP ONE: Insert into Supabase
-    const { error: dbError } = await supabase
-      .from("bookings") 
+    // Mapped exactly to your screenshot
+    const { error } = await supabase
+      .from("bookings")
       .insert([
         {
-          name: data.name,
+          full_name: data.name,
           email: data.email,
           address: data.address,
           booking_date: data.date,
-          time_preference: data.time,
-          massage_type: data.massage,
-          addon: data.addon || "None",
-          people: data.people,
+          ritual: data.massage,    // CHANGED from massage_type to ritual
+          time_pref: data.time,    // CHANGED from time_preference to time_pref
+          people: data.people,     // CHANGED from guests to people
+          // Addon is not in your screenshot, so we leave it out 
+          // or you need to add an 'addon' column in Supabase
         },
       ]);
 
-    if (dbError) {
-      console.error("Supabase Error:", dbError.message);
-      return { success: false, error: dbError.message };
-    }
-
-    // 4. STEP TWO: Send Confirmation Email
-    // This only runs if the Supabase insert was successful
-    try {
-      await resend.emails.send({
-  from: 'Maison Céleste <booking@maisonceleste.ie>',
-  to: [data.email],
-  replyTo: 'maisonceleste@outlook.ie',
-  subject: `Booking Confirmed: ${data.massage}`,
-        html: `
-          <div style="font-family: serif; color: #5A4A42; max-width: 600px; margin: auto; border: 1px solid #C4A052; padding: 40px;">
-            <h1 style="color: #C4A052; text-transform: uppercase; letter-spacing: 2px;">Your Ritual is Reserved</h1>
-            <p>Bonjour ${data.name},</p>
-            <p>We are delighted to confirm your mobile spa session in Limerick.</p>
-            <hr style="border: 0; border-top: 1px solid #C4A052; margin: 20px 0;" />
-            <p><strong>Ritual:</strong> ${data.massage}</p>
-            <p><strong>Date:</strong> ${data.date}</p>
-            <p><strong>Time:</strong> ${data.time}</p>
-            <p><strong>Location:</strong> ${data.address}</p>
-            <p><strong>Guests:</strong> ${data.people}</p>
-            ${data.addon ? `<p><strong>Enhancement:</strong> ${data.addon}</p>` : ''}
-            <hr style="border: 0; border-top: 1px solid #C4A052; margin: 20px 0;" />
-            <p style="font-size: 12px; font-style: italic;">We will contact you shortly if we require any further details for your appointment.</p>
-            <p>Warmly,<br /><strong>Maison Céleste</strong></p>
-          </div>
-        `,
-      });
-    } catch (emailErr) {
-      // We log the email error but don't stop the process 
-      // because the data is already saved in the database.
-      console.error("Email failed to send:", emailErr);
+    if (error) {
+      console.error("Supabase Error:", error.message);
+      return { success: false, error: error.message };
     }
 
     return { success: true };
-    
   } catch (err) {
-    console.error("Server Action Error:", err);
-    return { success: false, error: "Internal server error" };
+    return { 
+      success: false, 
+      error: err instanceof Error ? err.message : "Internal Server Error" 
+    };
   }
 }
