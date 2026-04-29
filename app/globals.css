@@ -1,31 +1,117 @@
-"use client";
-import { useState } from "react";
-import Link from "next/link";
+@import url('https://fonts.googleapis.com/css2?family=Great+Vibes&display=swap');
+@import "tailwindcss";
 
-export default function Navbar() {
-  const [isOpen, setIsOpen] = useState(false);
+/* 1. GLOBAL STYLES */
+body {
+  background-color: #FDFBF7;
+  color: #5A4A42;
+  font-family: Arial, sans-serif !important;
+  margin: 0;
+}
 
-  return (
-    <header className="header-container">
-      <div className="logo-section">
-        <h1 className="logo-text">Maison Celeste</h1>
-        <p className="logo-subtitle">Massages at your home</p>
-      </div>
+/* 2. DESKTOP HEADER FIX */
+.header-container {
+  display: flex;
+  justify-content: space-between; /* This keeps logo left and links right */
+  align-items: center;
+  padding: 20px 5%;
+  background: #FDFBF7;
+  position: relative;
+}
 
-      {/* Hamburger button with 3 lines */}
-      <button className="hamburger" onClick={() => setIsOpen(!isOpen)}>
-        <span className="line"></span>
-        <span className="line"></span>
-        <span className="line"></span>
-      </button>
+.logo-section {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start; /* Forces "Maison Celeste" and subtitle to the left */
+  text-align: left;
+}
 
-      {/* The 'active' class only applies when isOpen is true */}
-     <nav className={`nav-links ${isOpen ? "active" : ""}`}>
-        <Link href="/" onClick={() => setIsOpen(false)}>Home</Link>
-        <Link href="/services" onClick={() => setIsOpen(false)}>Services</Link>
-        <Link href="/booking" onClick={() => setIsOpen(false)}>Booking</Link>
-        <Link href="/contact" onClick={() => setIsOpen(false)}>Contact</Link>
-      </nav>
-    </header>
-  );
+.logo-text {
+  font-family: 'Great Vibes', cursive !important;
+  font-size: 2.8rem !important;
+  margin: 0;
+  line-height: 1;
+}
+
+.logo-subtitle {
+  color: #C4A052 !important;
+  font-size: 0.75rem;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  margin-top: 5px;
+}
+
+/* Desktop Nav Links */
+.nav-links {
+  display: flex;
+  gap: 30px;
+}
+
+.nav-links a {
+  text-decoration: none;
+  color: #5A4A42;
+  font-weight: bold;
+  text-transform: uppercase;
+  font-size: 0.85rem;
+  /* This makes the glow fade in smoothly instead of snapping */
+  transition: all 0.3s ease-in-out; 
+}
+
+/* THE GOLD GLOW EFFECT */
+.nav-links a:hover {
+  color: #D4AF37 !important; /* Brighter Vibrant Gold */
+  text-shadow: 0 0 8px rgba(212, 175, 55, 0.6), 0 0 12px rgba(212, 175, 55, 0.4);
+  transform: translateY(-1px); /* Subtly lifts the text up */
+}
+.hamburger {
+  display: none; /* Hidden on Desktop */
+  flex-direction: column;
+  gap: 5px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 10px;
+}
+
+.line {
+  width: 25px;
+  height: 2px;
+  background-color: #5A4A42;
+}
+
+/* 3. MOBILE STYLES */
+@media (max-width: 768px) {
+  .hamburger {
+    display: flex; /* Show on mobile */
+  }
+
+  .nav-links {
+    display: none; /* Hidden until 'active' class is added */
+    flex-direction: column;
+    position: absolute;
+    top: 100%;
+    left: 0;
+    width: 100%;
+    background: #FDFBF7;
+    padding: 20px 0;
+    text-align: center;
+    box-shadow: 0 10px 15px rgba(0,0,0,0.05);
+    z-index: 999;
+  }
+
+  .nav-links.active {
+    display: flex; /* Shows when hamburger is clicked */
+  }
+
+  .nav-links a {
+    padding: 15px 0;
+    display: block;
+  }
+  
+  .nav-links a:active { 
+    /* On mobile, 'active' (tapping) works better than hover */
+    color: #D4AF37 !important;
+    text-shadow: 0 0 10px rgba(212, 175, 55, 0.5);}
+
+  .logo-text { font-size: 2rem !important; }
 }
