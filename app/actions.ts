@@ -19,7 +19,11 @@ interface BookingData {
 
 export async function handleBookingForm(data: BookingData) {
   try {
-    // 1. Validation check
+    // 1. Health Check & Validation
+    if (!process.env.RESEND_API_KEY) {
+      console.error("CRITICAL: RESEND_API_KEY is missing from environment.");
+    }
+
     if (!data.name || !data.email || !data.phone || !data.address || !data.massage) {
       return { success: false, error: "Missing required fields" };
     }
@@ -47,9 +51,9 @@ export async function handleBookingForm(data: BookingData) {
       return { success: false, error: "Database save failed" };
     }
 
-    // 3. Send Batch Emails
+    // 3. Send Emails (Keeping your original HTML)
     try {
-      const { data: emailData, error: resendError } = await resend.batch.send([
+      const emailResult = await resend.batch.send([
         {
           from: 'Maison Céleste <booking@maisonceleste.ie>',
           to: [data.email],
@@ -59,7 +63,7 @@ export async function handleBookingForm(data: BookingData) {
             <div style="font-family: serif; color: #5A4A42; max-width: 600px; margin: auto; border: 1px solid #C4A052; padding: 40px; background-color: #FDFBF7;">
               <h1 style="color: #C4A052; text-transform: uppercase; letter-spacing: 2px; text-align: center;">Your Ritual is Reserved</h1>
               <p>Bonjour ${data.name},</p>
-              <p>We are delighted to receive your mobile spa request. Our team will reach to you as soon as possible.</p>
+              <p>We are delighted to receive your mobile spa request. Our team will arrive at your location in Limerick at the scheduled time.</p>
               <hr style="border: 0; border-top: 1px solid #C4A052; margin: 20px 0;" />
               <p style="margin: 10px 0;"><strong>Ritual:</strong> ${data.massage}</p>
               ${data.addon ? `<p style="margin: 10px 0;"><strong>Add-on:</strong> ${data.addon}</p>` : ''}
@@ -88,23 +92,22 @@ export async function handleBookingForm(data: BookingData) {
                 <tr><td style="padding: 8px; border-bottom: 1px solid #eee;"><strong>Date/Time:</strong></td><td style="padding: 8px; border-bottom: 1px solid #eee;">${data.date} (${data.time})</td></tr>
                 <tr><td style="padding: 8px; border-bottom: 1px solid #eee;"><strong>Address:</strong></td><td style="padding: 8px; border-bottom: 1px solid #eee;">${data.address}</td></tr>
               </table>
-              <p style="margin-top: 20px; font-size: 12px; color: #666;">Check Supabase dashboard for full history.</p>
             </div>
           `,
         }
       ]);
 
-      if (resendError) {
-        console.error("Resend Batch Error:", resendError);
+      if (emailResult.error) {
+        console.error("Resend API rejection:", emailResult.error);
       }
-    } catch (emailErr) {
-      console.error("Email processing failed:", emailErr);
+    } catch (err) {
+      console.error("Email network error:", err);
     }
 
     return { success: true };
 
   } catch (err) {
-    console.error("Internal Server Error:", err);
+    console.error("Action error:", err);
     return { success: false, error: "Internal server error" };
   }
 }
