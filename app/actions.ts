@@ -1,75 +1,93 @@
 "use server";
-import { createServerClient } from "@supabase/ssr";
-import { cookies } from "next/headers";
-import { Resend } from 'resend';
+
+import { Resend } from "resend";
+import { createClient } from "@/utils/supabase/server";
 
 const resend = new Resend(process.env.RESEND_API_KEY);
 
-export async function handleBookingForm(data: any) {
+interface BookingData {
+  name: string;
+  email: string;
+  phone: string;
+  address: string;
+  date: string;
+  time: string;
+  massage: string;
+  addon: string;
+  people: string;
+}
+
+export async function handleBookingForm(data: BookingData) {
   try {
-    const url = process.env.NEXT_PUBLIC_SUPABASE_URL!;
-    const key = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!;
-    const cookieStore = await cookies();
+    // 1. Validation
+    if (!data.name || !data.email || !data.phone || !data.address || !data.massage) {
+      return { success: false, error: "Missing required fields" };
+    }
 
-    const supabase = createServerClient(url, key, {
-      cookies: {
-        getAll() { return cookieStore.getAll(); },
-        setAll(cookiesToSet) {
-          try {
-            cookiesToSet.forEach(({ name, value, options }) =>
-              cookieStore.set(name, value, options)
-            );
-          } catch {}
-        },
-      },
-    });
+    // 2. Save to Supabase
+    const supabase = await createClient();
+    const { error: dbError } = await supabase
+      .from('bookings')
+      .insert([
+        {
+          full_name: data.name,
+          email: data.email,
+          phone: data.phone,
+          address: data.address,
+          ritual: data.massage,
+          booking_date: data.date,
+          time_pref: data.time,
+          people: data.people,
+          addon: data.addon
+        }
+      ]);
 
-    // 1. SAVE TO DATABASE
-    const { error: dbError } = await supabase.from("bookings").insert([
-      {
-        full_name: data.name,
-        email: data.email,
-        address: data.address,
-        booking_date: data.date,
-        ritual: data.massage,
-        time_pref: data.time,
-        people: data.people,
-        addon: data.addon || "None",
-      },
-    ]);
+    if (dbError) {
+      console.error("Supabase Error:", dbError);
+      return { success: false, error: "Database save failed" };
+    }
 
-    if (dbError) throw new Error(dbError.message);
+    // 3. Send Emails
+    // We wrap emails in their own try/catch so the user doesn't get an error 
+    // if the email fails but the database worked.
+    try {
+      await resend.emails.send({
+        from: 'Maison Céleste <booking@maisonceleste.ie>',
+        to: [data.email],
+        replyTo: 'maisonceleste@outlook.ie',
+        subject: `Booking Confirmed: ${data.massage}`,
+        html: `
+          <div style="font-family: serif; color: #5A4A42; max-width: 600px; margin: auto; border: 1px solid #C4A052; padding: 40px;">
+            <h1 style="color: #C4A052; text-transform: uppercase; letter-spacing: 2px;">Your Ritual is Reserved</h1>
+            <p>Bonjour ${data.name},</p>
+            <p>We are delighted to recieve your mobile spa session in Limerick.</p>
+            <hr style="border: 0; border-top: 1px solid #C4A052; margin: 20px 0;" />
+            <p><strong>Ritual:</strong> ${data.massage}</p>
+            <p><strong>Date:</strong> ${data.date}</p>
+            <p><strong>Time:</strong> ${data.time}</p>
+            <p><strong>Location:</strong> ${data.address}</p>
+            <p><strong>Phone:</strong> ${data.phone}</p>
+            <hr style="border: 0; border-top: 1px solid #C4A052; margin: 20px 0;" />
+            <p>Warmly,<br /><strong>Maison Céleste</strong></p>
+          </div>
+        `,
+      });
 
-    // 2. SEND NOTIFICATION TO YOU (Outlook)
-    await resend.emails.send({
-      from: 'Maison Celeste <bookings@maisoncelestelimerick.com>',
-      to: 'maisonceleste@outlook.ie',
-      subject: `✨ New Booking: ${data.name}`,
-      html: `<p>You have a new booking for <strong>${data.massage}</strong> on ${data.date} at ${data.time}.</p>`,
-    });
-
-    // 3. SEND CONFIRMATION TO CUSTOMER
-    await resend.emails.send({
-      from: 'Maison Celeste <bookings@maisoncelestelimerick.com>',
-      to: data.email, // This sends to the customer's email address
-      subject: `Booking Confirmed - Maison Celeste`,
-      html: `
-        <h1>Hi ${data.name},</h1>
-        <p>Your ritual at Maison Celeste has been recieved!</p>
-        <p><strong>Details:</strong></p>
-        <ul>
-          <li>Date: ${data.date}</li>
-          <li>Time: ${data.time}</li>
-          <li>Ritual: ${data.massage}</li>
-          <li>Add-on: ${data.addon || "None"}</li>
-        </ul>
-        <p>We will later confirm your appointment once we process your details .</p>
-      `,
-    });
+      // Host Notification (To You)
+      await resend.emails.send({
+        from: 'Maison Céleste <booking@maisonceleste.ie>',
+        to: ['maisonceleste@outlook.ie'],
+        subject: `NEW BOOKING: ${data.name}`,
+        html: `<p>New booking for ${data.massage}. Phone: ${data.phone}. Email: ${data.email}. address: ${data.address} time: ${data.time}</p>`
+      });
+    } catch (emailErr) {
+      console.error("Email sending failed:", emailErr);
+    }
 
     return { success: true };
-  } catch (err: any) {
-    console.error("Fatal Error:", err.message);
-    return { success: false, error: err.message };
+
+  } catch (err) {
+    console.error("Critical Server Error:", err);
+    return { success: false, error: "Internal server error" };
   }
 }
