@@ -1,9 +1,8 @@
-<<<<<<< HEAD
 import { createServerClient, type CookieOptions } from '@supabase/ssr'
 import { cookies } from 'next/headers'
 
 export async function createClient() {
-  // In Next.js 16+, cookies() is an async function
+  // In Next.js 15/16+, cookies() is an async function
   const cookieStore = await cookies()
 
   return createServerClient(
@@ -14,47 +13,19 @@ export async function createClient() {
         getAll() {
           return cookieStore.getAll()
         },
-        // We must define the type for cookiesToSet to stop the red lines
+        // Properly typed setAll to handle cookie updates
         setAll(cookiesToSet: { name: string; value: string; options: CookieOptions }[]) {
           try {
             cookiesToSet.forEach(({ name, value, options }) =>
               cookieStore.set(name, value, options)
             )
           } catch {
-            // This can be safely ignored if called from a Server Component
+            // This catch block is essential. 
+            // It prevents errors when createClient is called in Server Components 
+            // where cookies cannot be modified.
           }
         },
       },
     }
   )
-=======
-import { createServerClient, type CookieOptions } from '@supabase/ssr'
-import { cookies } from 'next/headers'
-
-export async function createClient() {
-  // In Next.js 16+, cookies() is an async function
-  const cookieStore = await cookies()
-
-  return createServerClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-    {
-      cookies: {
-        getAll() {
-          return cookieStore.getAll()
-        },
-        // We must define the type for cookiesToSet to stop the red lines
-        setAll(cookiesToSet: { name: string; value: string; options: CookieOptions }[]) {
-          try {
-            cookiesToSet.forEach(({ name, value, options }) =>
-              cookieStore.set(name, value, options)
-            )
-          } catch {
-            // This can be safely ignored if called from a Server Component
-          }
-        },
-      },
-    }
-  )
->>>>>>> a032c483f43a795aff26ff2347d1dbba8d96e4c1
 }
