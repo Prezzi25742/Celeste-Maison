@@ -19,17 +19,9 @@ interface BookingData {
 
 export async function handleBookingForm(data: BookingData) {
   try {
-    // 1. Health Check & Validation
-    if (!process.env.RESEND_API_KEY) {
-      console.error("CRITICAL: RESEND_API_KEY is missing from environment.");
-    }
-
-    if (!data.name || !data.email || !data.phone || !data.address || !data.massage) {
-      return { success: false, error: "Missing required fields" };
-    }
-
-    // 2. Save to Supabase
     const supabase = await createClient();
+
+    // 1. Save to Supabase
     const { error: dbError } = await supabase
       .from('bookings')
       .insert([
@@ -46,20 +38,17 @@ export async function handleBookingForm(data: BookingData) {
         }
       ]);
 
-    if (dbError) {
-      console.error("Supabase Error:", dbError.message);
-      return { success: false, error: "Database save failed" };
-    }
+    if (dbError) throw new Error(dbError.message);
 
-    // 3. Send Emails (Keeping your original HTML)
-    try {
-      const emailResult = await resend.batch.send([
-        {
-          from: 'Maison Céleste <booking@maisonceleste.ie>',
-          to: [data.email],
-          replyTo: 'maisonceleste@outlook.ie',
-          subject: `Booking Confirmed: ${data.massage}`,
-          html: `
+    // 2. Send Emails - UPDATED DOMAIN HERE
+    const emailResult = await resend.batch.send([
+      {
+        // Changed from .ie to maisoncelestelimerick.com to match your dashboard
+        from: 'Maison Céleste <booking@maisoncelestelimerick.com>',
+        to: [data.email],
+        replyTo: 'maisonceleste@outlook.ie',
+        subject: `Booking Confirmed: ${data.massage}`,
+        html: `
             <div style="font-family: serif; color: #5A4A42; max-width: 600px; margin: auto; border: 1px solid #C4A052; padding: 40px; background-color: #FDFBF7;">
               <h1 style="color: #C4A052; text-transform: uppercase; letter-spacing: 2px; text-align: center;">Your Ritual is Reserved</h1>
               <p>Bonjour ${data.name},</p>
@@ -75,12 +64,13 @@ export async function handleBookingForm(data: BookingData) {
               <p style="text-align: center; margin-top: 20px;">Warmly,<br /><strong>Maison Céleste</strong></p>
             </div>
           `,
-        },
-        {
-          from: 'Maison Céleste <booking@maisonceleste.ie>',
-          to: ['maisonceleste@outlook.ie'],
-          subject: `ACTION REQUIRED: New Booking - ${data.name}`,
-          html: `
+      },
+      {
+        // Changed from .ie to maisoncelestelimerick.com to match your dashboard
+        from: 'Maison Céleste <booking@maisoncelestelimerick.com>',
+        to: ['maisonceleste@outlook.ie'],
+        subject: `ACTION REQUIRED: New Booking - ${data.name}`,
+        html: `
             <div style="font-family: sans-serif; color: #333; padding: 20px; border: 2px solid #5A4A42;">
               <h2 style="color: #5A4A42;">New Booking Received</h2>
               <table style="width: 100%; border-collapse: collapse;">
@@ -94,20 +84,13 @@ export async function handleBookingForm(data: BookingData) {
               </table>
             </div>
           `,
-        }
-      ]);
-
-      if (emailResult.error) {
-        console.error("Resend API rejection:", emailResult.error);
       }
-    } catch (err) {
-      console.error("Email network error:", err);
-    }
+    ]);
 
     return { success: true };
 
-  } catch (err) {
-    console.error("Action error:", err);
-    return { success: false, error: "Internal server error" };
+  } catch (err: any) {
+    console.error("Action error:", err.message);
+    return { success: false, error: "Submission failed" };
   }
 }
