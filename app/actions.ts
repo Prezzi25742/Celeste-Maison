@@ -47,12 +47,12 @@ export async function handleBookingForm(data: BookingData) {
         from: 'Maison Céleste <booking@maisoncelestelimerick.com>',
         to: [data.email],
         replyTo: 'maisonceleste@outlook.ie',
-        subject: `Booking Confirmed: ${data.massage}`,
+        subject: `Booking Recieved!: ${data.massage}`,
         html: `
             <div style="font-family: serif; color: #5A4A42; max-width: 600px; margin: auto; border: 1px solid #C4A052; padding: 40px; background-color: #FDFBF7;">
-              <h1 style="color: #C4A052; text-transform: uppercase; letter-spacing: 2px; text-align: center;">Your Ritual is Reserved</h1>
+              <h1 style="color: #C4A052; text-transform: uppercase; letter-spacing: 2px; text-align: center;">Your Ritual is Recieved</h1>
               <p>Bonjour ${data.name},</p>
-              <p>We are delighted to receive your mobile spa request. Our team will arrive at your location in Limerick at the scheduled time.</p>
+              <p>We are delighted to receive your mobile spa request. Our team will reach back to you as soon as possible.</p>
               <hr style="border: 0; border-top: 1px solid #C4A052; margin: 20px 0;" />
               <p style="margin: 10px 0;"><strong>Ritual:</strong> ${data.massage}</p>
               ${data.addon ? `<p style="margin: 10px 0;"><strong>Add-on:</strong> ${data.addon}</p>` : ''}
