@@ -69,10 +69,10 @@ export async function handleBookingForm(data: BookingData) {
     <strong>Health Consultation</strong><br />
     To ensure your ritual is tailored safely to your needs, please complete our digital consultation form prior to our arrival. This information remains strictly confidential.
   </p>
-  <a href="[https://tally.so/r/A7qa0z?fbclid=PAVERFWARkGFdleHRuA2FlbQIxMABzcnRjBmFwcF9pZA8xMjQwMjQ1NzQyODc0MTQAAafLmS64ZrNY0aTwANgSoQS8bsjXnJxb_eh9y-byPaKV0fNc_XfQbgrbDQBEgA_aem_pWNRrex3Xc95GiJiBO75gA](https://tally.so/r/A7qa0z?fbclid=PAVERFWARkGFdleHRuA2FlbQIxMABzcnRjBmFwcF9pZA8xMjQwMjQ1NzQyODc0MTQAAafLmS64ZrNY0aTwANgSoQS8bsjXnJxb_eh9y-byPaKV0fNc_XfQbgrbDQBEgA_aem_pWNRrex3Xc95GiJiBO75gA)" 
-     style="color: #C4A052; font-size: 13px; font-weight: bold; text-decoration: underline;">
-     Complete Health Consultation Form →
-  </a>
+   <a href="https://tally.so/r/A7qa0z?fbclid=PAVERFWARkGFdleHRuA2FlbQIxMABzcnRjBmFwcF9pZA8xMjQwMjQ1NzQyODc0MTQAAafLmS64ZrNY0aTwANgSoQS8bsjXnJxb_eh9y-byPaKV0fNc_XfQbgrbDQBEgA_aem_pWNRrex3Xc95GiJiBO75gA](https://tally.so/r/A7qa0z?fbclid=PAVERFWARkGFdleHRuA2FlbQIxMABzcnRjBmFwcF9pZA8xMjQwMjQ1NzQyODc0MTQAAafLmS64ZrNY0aTwANgSoQS8bsjXnJxb_eh9y-byPaKV0fNc_XfQbgrbDQBEgA_aem_pWNRrex3Xc95GiJiBO75gA)" 
+                   style="background-color: #C4A052; color: white; padding: 12px 24px; text-decoration: none; font-size: 11px; text-transform: uppercase; letter-spacing: 2px; font-weight: bold; display: inline-block;">
+                    Complete Health Consultation Form →
+                </a>
 </div>
               
               <hr style="border: 0; border-top: 1px solid #C4A052; margin: 20px 0;" />
