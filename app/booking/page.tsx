@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import Link from "next/link";
 import { Check, AlertCircle } from "lucide-react"; 
 import { handleBookingForm } from "@/app/actions"; 
@@ -18,6 +18,14 @@ interface BookingData {
 }
 
 export default function BookingPage() {
+  // Calculate minimum date (tomorrow) to prevent early/past bookings
+  const minDate = useMemo(() => {
+    const today = new Date();
+    const tomorrow = new Date(today);
+    tomorrow.setDate(tomorrow.getDate() + 1);
+    return tomorrow.toISOString().split('T')[0];
+  }, []);
+
   const [formData, setFormData] = useState<BookingData>({
     name: "",
     email: "",
@@ -98,30 +106,63 @@ export default function BookingPage() {
           ) : (
             <form onSubmit={handleSubmit} className="space-y-6">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <input type="text" placeholder="Name" className="w-full border-b py-2 outline-none" value={formData.name} onChange={(e) => setFormData({...formData, name: e.target.value})} />
-                <input type="email" placeholder="Email" className="w-full border-b py-2 outline-none" value={formData.email} onChange={(e) => setFormData({...formData, email: e.target.value})} />
+                <input type="text" placeholder="Full Name" className="w-full border-b py-2 outline-none bg-transparent" value={formData.name} onChange={(e) => setFormData({...formData, name: e.target.value})} />
+                <input type="email" placeholder="Email" className="w-full border-b py-2 outline-none bg-transparent" value={formData.email} onChange={(e) => setFormData({...formData, email: e.target.value})} />
               </div>
-              <input type="tel" placeholder="Phone" className="w-full border-b py-2 outline-none" value={formData.phone} onChange={(e) => setFormData({...formData, phone: e.target.value})} />
-              <input type="text" placeholder="Address" className="w-full border-b py-2 outline-none" value={formData.address} onChange={(e) => setFormData({...formData, address: e.target.value})} />
               
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <select className="w-full border-b py-2 outline-none" value={formData.massage} onChange={(e) => setFormData({...formData, massage: e.target.value})}>
+                <input type="tel" placeholder="Phone Number" className="w-full border-b py-2 outline-none bg-transparent" value={formData.phone} onChange={(e) => setFormData({...formData, phone: e.target.value})} />
+                <input type="text" placeholder="Address (Eircode/Limerick)" className="w-full border-b py-2 outline-none bg-transparent" value={formData.address} onChange={(e) => setFormData({...formData, address: e.target.value})} />
+              </div>
+              
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <select className="w-full border-b py-2 outline-none bg-transparent cursor-pointer" value={formData.massage} onChange={(e) => setFormData({...formData, massage: e.target.value, addon: ""})}>
                   <option value="">Select Ritual...</option>
                   <option value="Swedish Massage">Swedish Massage</option>
                   <option value="Deep Tissue Massage">Deep Tissue Massage</option>
                   <option value="Japanese Face Lift">Japanese Face Lift</option>
+                  <option value="Back, Neck and Shoulders">Back, Neck and Shoulders</option>
                 </select>
-                <input type="date" className="w-full border-b py-2 outline-none" value={formData.date} onChange={(e) => setFormData({...formData, date: e.target.value})} />
+                
+                <select className="w-full border-b py-2 outline-none bg-transparent cursor-pointer" value={formData.addon} onChange={(e) => setFormData({...formData, addon: e.target.value})}>
+                  <option value="">No Add-on</option>
+                  <option value="Scalp Massage">Scalp Massage (+30 Mins)</option>
+                </select>
               </div>
 
-              <select className="w-full border-b py-2 outline-none" value={formData.time} onChange={(e) => setFormData({...formData, time: e.target.value})}>
-                <option value="">Select Time</option>
-                <option value="morning">Morning</option>
-                <option value="afternoon">Afternoon</option>
-                <option value="evening">Evening</option>
-              </select>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div>
+                  <label className="block text-[10px] uppercase tracking-widest text-[#5A4A42] mb-1 opacity-50">Select Date</label>
+                  <input 
+                    type="date" 
+                    min={minDate} 
+                    className="w-full border-b py-2 outline-none bg-transparent cursor-pointer" 
+                    value={formData.date} 
+                    onChange={(e) => setFormData({...formData, date: e.target.value})} 
+                  />
+                </div>
+                
+                <div>
+                   <label className="block text-[10px] uppercase tracking-widest text-[#5A4A42] mb-1 opacity-50">Guests</label>
+                   <select className="w-full border-b py-2 outline-none bg-transparent cursor-pointer" value={formData.people} onChange={(e) => setFormData({...formData, people: e.target.value})}>
+                    <option value="1">1 Person</option>
+                    <option value="2">2 People</option>
+                    <option value="3">3 People</option>
+                  </select>
+                </div>
 
-              <button type="submit" disabled={isSubmitting} className="w-full bg-[#C4A052] text-white py-4 uppercase tracking-widest text-xs font-semibold disabled:opacity-50">
+                <div>
+                  <label className="block text-[10px] uppercase tracking-widest text-[#5A4A42] mb-1 opacity-50">Preference</label>
+                  <select className="w-full border-b py-2 outline-none bg-transparent cursor-pointer" value={formData.time} onChange={(e) => setFormData({...formData, time: e.target.value})}>
+                    <option value="">Time...</option>
+                    <option value="morning">Morning</option>
+                    <option value="afternoon">Afternoon</option>
+                    <option value="evening">Evening</option>
+                  </select>
+                </div>
+              </div>
+
+              <button type="submit" disabled={isSubmitting} className="w-full bg-[#C4A052] text-white py-4 uppercase tracking-widest text-xs font-semibold disabled:opacity-50 transition-colors hover:bg-[#5A4A42]">
                 {isSubmitting ? "Processing..." : "Submit Request"}
               </button>
             </form>
