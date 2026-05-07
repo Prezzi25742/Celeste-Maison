@@ -122,6 +122,9 @@ export default function BookingPage() {
                   <option value="Deep Tissue Massage">Deep Tissue Massage</option>
                   <option value="Japanese Face Lift">Japanese Face Lift</option>
                   <option value="Back, Neck and Shoulders">Back, Neck and Shoulders</option>
+                  <option value="Californian Massage">"Californian Massage</option>
+                  <option value="Oriental Massage">Oriental Massage</option>
+                  <option value="Lymphatic Massage">Lymphatic Massage</option>
                 </select>
                 
                 <select className="w-full border-b py-2 outline-none bg-transparent cursor-pointer" value={formData.addon} onChange={(e) => setFormData({...formData, addon: e.target.value})}>
