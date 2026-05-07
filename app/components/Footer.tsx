@@ -37,9 +37,10 @@ export default function Footer() {
       <div className="border-t border-[#C4A052]/20 py-8 text-center px-6">
         <div className="max-w-7xl mx-auto text-[10px] tracking-widest uppercase font-light text-[#FDFBF7]/60 flex flex-col md:flex-row justify-between gap-4">
           <p>© 2026 Maison Celeste Limerick, Ireland</p>
+
           <div className="flex gap-8">
-            <a href="#" className="hover:text-[#C4A052] transition-colors">Cookie Policy</a>
-            <a href="#" className="hover:text-[#C4A052] transition-colors">Privacy Policy</a>
+            <a href="/cookies" className="hover:text-[#C4A052] transition-colors">Cookie Policy</a>
+            <a href="/privacy" className="hover:text-[#C4A052] transition-colors">Privacy Policy</a>
           </div>
         </div>
       </div>
