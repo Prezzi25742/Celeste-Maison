@@ -129,7 +129,7 @@ export default function BookingPage() {
                 
                 <select className="w-full border-b py-2 outline-none bg-transparent cursor-pointer" value={formData.addon} onChange={(e) => setFormData({...formData, addon: e.target.value})}>
                   <option value="">No Add-on</option>
-                  <option value="Scalp Massage">Scalp Massage (+30 Mins)</option>
+                  <option value="Scalp Massage">Scalp Massage (+20 Mins)</option>
                 </select>
               </div>
 
