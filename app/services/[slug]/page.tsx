@@ -32,7 +32,7 @@ export default function RitualTemplate({ params }: { params: Promise<{ slug: str
     },
     "scalp-massage": {
       title: "Scalp Massage",
-      duration: "25 Mins — €25 ADD-ON ONLY",
+      duration: "25 Mins — €20 ADD-ON ONLY",
       description: "Experience our Scalp Massage to instantly melt away any mental fatigue and leave you deeply recharged.",
     },
     "californian-massage": {
