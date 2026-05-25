@@ -13,14 +13,15 @@ interface BookingData {
   date: string;
   time: string;
   massage: string;
+  duration: string;
   addon: string;
   people: string;
 }
 
 export async function handleBookingForm(data: BookingData) {
   try {
-    // 1. Validation
-    if (!data.name || !data.email || !data.phone || !data.address || !data.massage) {
+    // 1. Validation 
+    if (!data.name || !data.email || !data.phone || !data.address || !data.massage || !data.duration) {
       return { success: false, error: "Missing required fields" };
     }
 
@@ -35,6 +36,7 @@ export async function handleBookingForm(data: BookingData) {
           phone: data.phone,
           address: data.address,
           ritual: data.massage,
+          duration: data.duration,
           booking_date: data.date,
           time_pref: data.time,
           people: data.people,
@@ -48,9 +50,9 @@ export async function handleBookingForm(data: BookingData) {
     }
 
     // 3. Send Emails
-    // We wrap emails in their own try/catch so the user doesn't get an error 
-    // if the email fails but the database worked.
+    // Wrapped in its own try/catch so the database save still succeeds even if email fails
     try {
+      // Client Confirmation Email
       await resend.emails.send({
         from: 'Maison Céleste <booking@maisonceleste.ie>',
         to: [data.email],
@@ -60,9 +62,10 @@ export async function handleBookingForm(data: BookingData) {
           <div style="font-family: serif; color: #5A4A42; max-width: 600px; margin: auto; border: 1px solid #C4A052; padding: 40px;">
             <h1 style="color: #C4A052; text-transform: uppercase; letter-spacing: 2px;">Your Ritual is Reserved</h1>
             <p>Bonjour ${data.name},</p>
-            <p>We are delighted to recieve your mobile spa session in Limerick.</p>
+            <p>We are delighted to receive your mobile spa session request in Limerick.</p>
             <hr style="border: 0; border-top: 1px solid #C4A052; margin: 20px 0;" />
             <p><strong>Ritual:</strong> ${data.massage}</p>
+            <p><strong>Duration:</strong> ${data.duration} Minutes</p>
             <p><strong>Date:</strong> ${data.date}</p>
             <p><strong>Time:</strong> ${data.time}</p>
             <p><strong>Location:</strong> ${data.address}</p>
@@ -78,7 +81,7 @@ export async function handleBookingForm(data: BookingData) {
         from: 'Maison Céleste <booking@maisonceleste.ie>',
         to: ['maisonceleste@outlook.ie'],
         subject: `NEW BOOKING: ${data.name}`,
-        html: `<p>New booking for ${data.massage}. Phone: ${data.phone}. Email: ${data.email}. address: ${data.address} time: ${data.time}</p>`
+        html: `<p>New booking for ${data.massage} (${data.duration} mins). Phone: ${data.phone}. Email: ${data.email}. Address: ${data.address}. Time: ${data.time}</p>`
       });
     } catch (emailErr) {
       console.error("Email sending failed:", emailErr);

@@ -13,21 +13,30 @@ export default function RitualTemplate({ params }: { params: Promise<{ slug: str
     "back-neck-shoulders": {
       title: "Back, Neck and Shoulders",
       duration: "45 Mins — €65",
+      durationTwo: "70 Mins — €110",
+    durationThree: "90 Mins — €130",
+    
       description: "Experience the ultimate relief with our full personalized; Back, Neck and Shoulder Massage. Tailored 100% to your specific tensions, this deep-tissue treatment targets stubborn knots and releases accumulated stress. From the lower back to the base of the skull, every stroke is adapted to your body's unique needs. Restore your mobility and find instant calm in one powerful, focused session.",
     },
     "japanese-face-lift": {
       title: "Japanese Face Lift",
-      duration: "80 Mins — €145",
+      duration: "70 Mins — €110",
+    durationTwo: "90 Mins — €130",
+    durationThree: "120 Mins — €170",
       description: "Experience the ultimate needle-free rejuvenation. This ancient Japanese technique naturally sculpt your contours, smoothes fine line and restores a radiant glow through deep-tissue massage. Achieve visible lifting and profound relaxation in one powerful, holistic treatment.",
     },
     "swedish-massage": {
       title: "Swedish Massage",
-      duration: "70 Mins — €110",
+       duration: "70 Mins — €110",
+    durationTwo: "90 Mins — €130",
+    durationThree: "120 Mins — €170",
       description: "An iconic and refined treatment, combining long, flowing strokes with expert kneading and delicate friction. This ritual awakens the body, enchances circulation, and restores vitality. A perfect introduction to art of massage.",
     },
     "deep-tissue-massage": {
       title: "Deep Tissue Massage",
-      duration: "70 Mins — €110",
+       duration: "70 Mins — €110",
+    durationTwo: "90 Mins — €130",
+    durationThree: "120 Mins — €170",
       description: "A powerful and targeted technique designed to release deeply rooted tension. Through slow, precise and sustained presssure, it works into the deeper layers of muscle tissue, offering relief, recovery, and renewed mobility.",
     },
     "scalp-massage": {
@@ -37,19 +46,35 @@ export default function RitualTemplate({ params }: { params: Promise<{ slug: str
     },
     "californian-massage": {
       title: "Californian Massage",
-      duration: "70 Mins — €110",
+       duration: "70 Mins — €110",
+    durationTwo: "90 Mins — €130",
+    durationThree: "120 Mins — €170",
       description: "Often described as a 'massage of the soul' this deeply enveloping ritual feature slow, graceful and continous movements and mind, inviting profound relaxation an emotional relaease.",
     },
     "oriental-massage": {
       title: "Oriental Massage",
-      duration: "70 Mins — €110",
+       duration: "70 Mins — €110",
+    durationTwo: "90 Mins — €130",
+    durationThree: "120 Mins — €170",
       description: "Inspired by ancestral traditions, this holitic ritual blends rhythmic movements with precise pressure along the body's energy pathways. It rebalances the flo of energy, detoxifies the body, and restores inner harmony.",
     },
 
     "lymphatic-massage": {
     title: "Lymphatic Massage",
     duration: "70 Mins — €110",
+    durationTwo: "90 Mins — €130",
+    durationThree: "120 Mins — €170",
+   
     description: "A gentle, rhythmic treatment designed to stimulate the lymphatic system and encourage the natural drainage of toxins. This soothing ritual reduces fluid retention, boosts the immune system, and leaves you feeling deeply cleansed, incredibly light, and completely revitalized.",
+  },
+  
+  "duo-massage": {
+    title: "Duo Treatment Massage",
+    duration: "70 Mins — €210",
+    durationTwo: "90 Mins — €270",
+    durationThree: "120 Mins — €360",
+    
+    description: "Escape the noise of the world and reconnect in a sanctuary designed for two. Side by side in our private couples suite, you and your companion will enjoy synchronized massages tailored to your individual needs. Soft lighting, calming aromatherapy, and the soothing rhythm of expert touch create a shared space of deep relaxation and harmony. Perfect for partners, best friends, or family looking to unwind together,"
   }
   };
 

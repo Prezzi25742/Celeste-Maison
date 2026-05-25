@@ -7,10 +7,14 @@ export default function Navbar() {
 
   return (
     <header className="header-container">
-      <div className="logo-section">
-        <h1 className="logo-text">Maison Celeste</h1>
-        <p className="logo-subtitle">Massages at your home</p>
-      </div>
+      <Link href="/" className="logo-section group block">
+  <h1 className="logo-text group-hover:text-[#C4A052] transition-colors">
+    Maison Celeste
+  </h1>
+  <p className="logo-subtitle">
+    Massages at your home
+  </p>
+</Link>
 
       {/* Hamburger button with 3 lines */}
       <button className="hamburger" onClick={() => setIsOpen(!isOpen)}>
