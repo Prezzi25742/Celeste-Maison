@@ -207,7 +207,7 @@ export default function BookingPage() {
               {/* Row 1: Name and Email */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               
-                <input type="text" placeholder="Address (Eircode/Limerick)" className="w-full border-b py-2 outline-none bg-transparent" value={formData.address} onChange={(e) => setFormData({...formData, address: e.target.value})} />
+               
               </div>
 
               {/* Row 2: Phone and Duration */}
