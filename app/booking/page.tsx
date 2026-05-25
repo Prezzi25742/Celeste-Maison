@@ -116,6 +116,7 @@ export default function BookingPage() {
     } finally { // Keep this one
       setIsSubmitting(false);
     }
+  }
   }; // This closes your function
   // Handle duration changes to enforce ritual logic (45m or 120m)
   const handleDurationChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
@@ -363,4 +364,4 @@ export default function BookingPage() {
       </div>
     </main>
   );
-}
+  }
