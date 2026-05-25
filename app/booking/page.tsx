@@ -101,28 +101,22 @@ export default function BookingPage() {
           ...formData,
         });
 
-        if (result && result.success) {
-          setIsSuccess(true);
-          setFormData({ 
-            name: "", email: "", phone: "", address: "", date: "",
-            time: "", massage: "", duration: "", people: "1", addon: "" 
-          });
-        } else {
-          alert("Booking failed: " + (result?.error || "Unknown error"));
-        }
-      } catch (error) {
-        console.error("Submission error:", error);
-        alert("A server error occurred.");
-      } finally {
-        setIsSubmitting(false);
+      if (result && result.success) {
+        setIsSuccess(true);
+        setFormData({ 
+          name: "", email: "", phone: "", address: "", date: "",
+          time: "", massage: "", duration: "", people: "1", addon: "" 
+        });
+      } else {
+        alert("Booking failed: " + (result?.error || "Unknown error"));
       }
-    } catch (error) {
+    } catch (error) { // Keep this one
+      console.error("Submission error:", error);
       alert("A server error occurred.");
-    } finally {
+    } finally { // Keep this one
       setIsSubmitting(false);
     }
-  };
-
+  }; // This closes your function
   // Handle duration changes to enforce ritual logic (45m or 120m)
   const handleDurationChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const newDuration = e.target.value;
