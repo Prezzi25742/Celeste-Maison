@@ -54,7 +54,7 @@ export async function handleBookingForm(data: BookingData) {
     try {
       // Client Confirmation Email
       await resend.emails.send({
-        from: 'Maison Céleste <booking@maisonceleste.ie>',
+        from: 'Maison Céleste <booking@maisoncelestelimerick.ie>',
         to: [data.email],
         replyTo: 'maisonceleste@outlook.ie',
         subject: `Your Ritual is Reserved | Maison Céleste`,
