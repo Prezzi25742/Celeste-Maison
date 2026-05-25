@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import Link from "next/link";
 import { Check, AlertCircle } from "lucide-react"; 
 import { handleBookingForm } from "@/app/actions"; 
@@ -116,6 +116,10 @@ export default function BookingPage() {
       } finally {
         setIsSubmitting(false);
       }
+    } catch (error) {
+      alert("A server error occurred.");
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -158,10 +162,7 @@ export default function BookingPage() {
   return (
     <main className="min-h-screen bg-[#5A4A42] py-24 px-6 flex flex-col items-center justify-center font-sans selection:bg-[#C4A052] selection:text-white">
       <div className="max-w-4xl w-full mb-8">
-        <Link 
-          href="/" 
-          className="text-[#C4A052] uppercase tracking-widest text-xs font-semibold hover:text-[#FDFBF7] transition-colors flex items-center gap-2 w-fit"
-        >
+        <Link href="/" className="text-[#C4A052] uppercase tracking-widest text-xs font-semibold hover:text-[#FDFBF7] transition-colors flex items-center gap-2 w-fit">
           ← Back to Home
         </Link>
       </div>
@@ -185,16 +186,13 @@ export default function BookingPage() {
           <div className="space-y-4 text-xs tracking-wider font-light">
             <p>Limerick, Ireland</p>
             <p>maisonceleste@outlook.ie</p>
-            <p>7:00 AM – 11:00 PM</p>
           </div>
         </div>
 
         <div className="md:w-2/3 p-10 bg-[#FDFBF7]">
           {isSuccess ? (
-            <div className="h-full min-h-[400px] flex flex-col items-center justify-center text-center space-y-4">
-              <div className="w-16 h-16 bg-green-100 text-green-700 rounded-full flex items-center justify-center mb-4 shadow-sm">
-                <Check className="w-8 h-8" />
-              </div>
+            <div className="h-full min-h-[400px] flex flex-col items-center justify-center text-center">
+              <div className="w-16 h-16 bg-green-100 text-green-700 rounded-full flex items-center justify-center mb-4"><Check /></div>
               <h2 className="text-3xl font-serif text-[#5A4A42]">Request Received</h2>
               <p className="text-[#5A4A42]/70 max-w-sm">
                 We will contact you shortly via email to confirm your ritual details. <br/><br/>
@@ -206,29 +204,15 @@ export default function BookingPage() {
             </div>
           ) : (
             <form onSubmit={handleSubmit} className="space-y-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <input type="text" placeholder="Full Name" className="w-full border-b py-2 outline-none bg-transparent" value={formData.name} onChange={(e) => setFormData({...formData, name: e.target.value})} />
+                <input type="email" placeholder="Email" className="w-full border-b py-2 outline-none bg-transparent" value={formData.email} onChange={(e) => setFormData({...formData, email: e.target.value})} />
+              </div>
               
               {/* Row 1: Name and Email */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div>
-                  <label className="block text-[10px] uppercase tracking-widest text-[#5A4A42] mb-2 font-semibold">Full Name</label>
-                  <input 
-                    type="text"
-                    className={`w-full border-b ${errors.name ? 'border-red-400' : 'border-[#5A4A42]/20'} py-2 focus:border-[#C4A052] outline-none transition-colors text-sm bg-transparent text-[#5A4A42]`}
-                    value={formData.name}
-                    onChange={(e) => setFormData({...formData, name: e.target.value})}
-                  />
-                  {errors.name && <p className="text-red-500 text-[10px] mt-1 flex items-center gap-1"><AlertCircle className="w-3 h-3"/> {errors.name}</p>}
-                </div>
-                <div>
-                  <label className="block text-[10px] uppercase tracking-widest text-[#5A4A42] mb-2 font-semibold">Email Address</label>
-                  <input 
-                    type="email"
-                    className={`w-full border-b ${errors.email ? 'border-red-400' : 'border-[#5A4A42]/20'} py-2 focus:border-[#C4A052] outline-none transition-colors text-sm bg-transparent text-[#5A4A42]`}
-                    value={formData.email}
-                    onChange={(e) => setFormData({...formData, email: e.target.value})}
-                  />
-                  {errors.email && <p className="text-red-500 text-[10px] mt-1 flex items-center gap-1"><AlertCircle className="w-3 h-3"/> {errors.email}</p>}
-                </div>
+                <input type="tel" placeholder="Phone Number" className="w-full border-b py-2 outline-none bg-transparent" value={formData.phone} onChange={(e) => setFormData({...formData, phone: e.target.value})} />
+                <input type="text" placeholder="Address (Eircode/Limerick)" className="w-full border-b py-2 outline-none bg-transparent" value={formData.address} onChange={(e) => setFormData({...formData, address: e.target.value})} />
               </div>
 
               {/* Row 2: Phone and Duration */}
@@ -324,7 +308,7 @@ export default function BookingPage() {
               {/* Row 5: Date, Guests, Time */}
               <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                 <div>
-                  <label className="block text-[10px] uppercase tracking-widest text-[#5A4A42] mb-2 font-semibold">Date</label>
+                  <label className="block text-[10px] uppercase tracking-widest text-[#5A4A42] mb-1 opacity-50">Select Date</label>
                   <input 
                     type="date"
                     min={new Date().toISOString().split('T')[0]} 
@@ -334,33 +318,23 @@ export default function BookingPage() {
                   />
                   {errors.date && <p className="text-red-500 text-[10px] mt-1 flex items-center gap-1"><AlertCircle className="w-3 h-3"/> {errors.date}</p>}
                 </div>
-
+                
                 <div>
-                  <label className="block text-[10px] uppercase tracking-widest text-[#5A4A42] mb-2 font-semibold">Guests</label>
-                  <select 
-                    className="w-full border-b border-[#5A4A42]/20 py-2 focus:border-[#C4A052] outline-none text-sm bg-transparent text-[#5A4A42] cursor-pointer"
-                    value={formData.people}
-                    onChange={(e) => setFormData({...formData, people: e.target.value})}
-                  >
-                    {[1, 2, 3, 4, 5].map((num) => (
-                      <option key={num} value={num}>
-                        {num} {num === 1 ? 'Person' : 'People'}
-                      </option>
-                    ))}
+                   <label className="block text-[10px] uppercase tracking-widest text-[#5A4A42] mb-1 opacity-50">Guests</label>
+                   <select className="w-full border-b py-2 outline-none bg-transparent cursor-pointer" value={formData.people} onChange={(e) => setFormData({...formData, people: e.target.value})}>
+                    <option value="1">1 Person</option>
+                    <option value="2">2 People</option>
+                    <option value="3">3 People</option>
                   </select>
                 </div>
 
                 <div>
-                  <label className="block text-[10px] uppercase tracking-widest text-[#5A4A42] mb-2 font-semibold">Time</label>
-                  <select 
-                    className={`w-full border-b ${errors.time ? 'border-red-400' : 'border-[#5A4A42]/20'} py-2 focus:border-[#C4A052] outline-none text-sm bg-transparent text-[#5A4A42] cursor-pointer`}
-                    value={formData.time}
-                    onChange={(e) => setFormData({...formData, time: e.target.value})}
-                  >
-                    <option value="">Select Time</option>
-                    <option value="morning">Morning (7am - 12pm)</option>
-                    <option value="afternoon">Afternoon (12pm - 5pm)</option>
-                    <option value="evening">Evening (5pm - 11pm)</option>
+                  <label className="block text-[10px] uppercase tracking-widest text-[#5A4A42] mb-1 opacity-50">Preference</label>
+                  <select className="w-full border-b py-2 outline-none bg-transparent cursor-pointer" value={formData.time} onChange={(e) => setFormData({...formData, time: e.target.value})}>
+                    <option value="">Time...</option>
+                    <option value="morning">Morning</option>
+                    <option value="afternoon">Afternoon</option>
+                    <option value="evening">Evening</option>
                   </select>
                   {errors.time && <p className="text-red-500 text-[10px] mt-1 flex items-center gap-1"><AlertCircle className="w-3 h-3"/> {errors.time}</p>}
                 </div>
