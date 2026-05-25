@@ -10,6 +10,7 @@ export default function RitualsPage() {
     { name: "Californian Massage", slug: "californian-massage", img: "/images/service-californian.jpg" },
     { name: "Oriental Massage", slug: "oriental-massage", img: "/images/service-oriental.jpg" },
     { name: "Lymphatic Massage", slug: "lymphatic-massage", img: "/images/service-lymphatic.jpg" },
+    { name: "Duo Treatment Massage", slug: "duo-massage", img: "/images/service-duo.jpg" },
   ];
 
   return (
