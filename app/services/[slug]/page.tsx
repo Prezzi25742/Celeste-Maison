@@ -110,7 +110,22 @@ export default function RitualTemplate({ params }: { params: Promise<{ slug: str
           <Clock className="w-6 h-6" /> 
           <span>{service.duration}</span>
         </div>
+
+        <div className="flex justify-center items-center gap-3 text-[#C4A052] tracking-[0.3em] text-xl md:text-2xl uppercase font-medium">
+          <Clock className="w-6 h-6" /> 
+          <span>{service.durationTwo}</span>
+        </div>
+
+        <div className="flex justify-center items-center gap-3 text-[#C4A052] tracking-[0.3em] text-xl md:text-2xl uppercase font-medium">
+          <Clock className="w-6 h-6" /> 
+          <span>{service.durationThree}</span>
+        </div>
+
       </div>
+
+      
+      
+      
 
       {/* Content Section */}
       <div className="max-w-3xl mx-auto py-20 px-6">
