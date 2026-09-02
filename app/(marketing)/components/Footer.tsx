@@ -15,13 +15,13 @@ export default function Footer() {
         <div className="flex flex-col">
           <h3 className="font-serif text-lg tracking-widest uppercase mb-6 text-[#C4A052]">CONTACT</h3>
           <p className="text-sm font-light leading-relaxed mb-1">
-            ✉️maisonceleste@outlook.ie
+            maisonceleste@outlook.ie
           </p>
           <p className="text-sm font-light leading-relaxed lowercase">
-           🅾 maison.celeste.wellness
+            maison.celeste.wellness
           </p>
           <p className="text-sm font-light leading-relaxed lowercase">
-            ✆ +330683378384
+             +330683378384
           </p>
         </div>
 

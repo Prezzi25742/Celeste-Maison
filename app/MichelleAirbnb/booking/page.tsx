@@ -2,7 +2,7 @@
 
 import 'react-phone-number-input/style.css'
 import PhoneInput from 'react-phone-number-input'
-import { useState } from "react"; // Removed unused useMemo
+import { useState } from "react";
 import Link from "next/link";
 import { Check, AlertCircle } from "lucide-react"; 
 import { handleBookingForm } from "@/app/actions"; 
@@ -17,53 +17,43 @@ interface BookingData {
   massage: string;
   duration: string;
   addon: string;
+  addonCount: string;
   people: string;
 }
 
 const BASE_PRICES: { [key: string]: number } = {
-  "45": 65,  
+  "30": 55,  
+  "45": 69,  
   "70": 110,  
-  "90": 130,  
-  "120": 170, 
 };
 
-const DUO_PRICES: { [key: string]: number } = {
-  "70": 210,
-  "90": 270,
-  "120": 360,
-};
-
-const ADDON_PRICE = 20;
+const ADDON_PRICE = 15;
 
 export default function BookingPage() {
   const [formData, setFormData] = useState<BookingData>({
-    name: "", email: "", phone: "", address: "",
+    name: "", email: "", phone: "", address: "Mount Eagle",
     date: "", time: "", massage: "", duration: "",
-    addon: "", people: "1",
+    addon: "", addonCount: "1", people: "2",
   });
   
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
-  // NEW: State to hold backend API errors (Twilio/Email)
   const [serverError, setServerError] = useState<string | null>(null); 
   
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
 
+  const getMinGuests = (duration: string) => {
+    if (duration === "30" || duration === "45") return 6;
+    if (duration === "70") return 2;
+    return 2;
+  };
+
   const calculateTotal = () => {
-    const isDuo = formData.massage === "Duo Treatment Massage";
-    const basePrice = isDuo 
-      ? (DUO_PRICES[formData.duration] || 0) 
-      : (BASE_PRICES[formData.duration] || 0);
-      
-    const addonPrice = formData.addon ? ADDON_PRICE : 0;
+    const basePrice = BASE_PRICES[formData.duration] || 0;
     const guests = parseInt(formData.people, 10) || 1;
+    const addonGuests = formData.addon ? (parseInt(formData.addonCount, 10) || 0) : 0;
 
-    if (isDuo) {
-      const multiplier = Math.max(1, Math.floor(guests / 2));
-      return (basePrice + addonPrice) * multiplier;
-    }
-
-    return (basePrice + addonPrice) * guests;
+    return (basePrice * guests) + (ADDON_PRICE * addonGuests);
   };
 
   const validate = () => {
@@ -77,7 +67,6 @@ export default function BookingPage() {
     if (!formData.phone) newErrors.phone = "Phone number is required";
     if (!formData.duration) newErrors.duration = "Please select a duration";
     if (!formData.massage) newErrors.massage = "Please select a massage ritual";
-    if (!formData.address) newErrors.address = "Service address is required";
     if (!formData.date) newErrors.date = "Please select a date";
     if (!formData.time) newErrors.time = "Please select a time preference";
     
@@ -87,23 +76,23 @@ export default function BookingPage() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setServerError(null); // Clear previous server errors on new attempt
+    setServerError(null);
     
     if (validate()) {
       setIsSubmitting(true);
       try {
         const result = await handleBookingForm({
           ...formData,
+          address: "Mount Eagle",
         });
 
         if (result && result.success) {
           setIsSuccess(true);
           setFormData({ 
-            name: "", email: "", phone: "", address: "", date: "",
-            time: "", massage: "", duration: "", people: "1", addon: "" 
+            name: "", email: "", phone: "", address: "Mount Eagle", date: "",
+            time: "", massage: "", duration: "", people: "2", addon: "", addonCount: "1" 
           });
         } else {
-          // UPDATE: Replace alert() with inline server error
           setServerError(result?.error || "Unable to verify booking details. Please try again.");
         }
       } catch (error) { 
@@ -117,39 +106,66 @@ export default function BookingPage() {
 
   const handleDurationChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const newDuration = e.target.value;
+    const minGuests = getMinGuests(newDuration);
+
     setFormData(prev => {
       let newMassage = prev.massage;
       
-      if (newDuration === "45") {
-        newMassage = "Back, Neck and Shoulders";
-      } 
-      else if (newDuration === "120" && prev.massage === "Back, Neck and Shoulders") {
+      if (newDuration === "30") {
+        newMassage = "Back, Neck & Shoulders";
+      } else {
         newMassage = "";
       }
-      else if (newDuration === "45" && prev.massage === "Duo Treatment Massage") {
-        newMassage = "Back, Neck and Shoulders";
-      }
 
-      return { ...prev, duration: newDuration, massage: newMassage, addon: "" };
+      const currentPeople = parseInt(prev.people, 10) || 1;
+      const updatedPeople = currentPeople < minGuests ? minGuests.toString() : prev.people;
+
+      return { 
+        ...prev, 
+        duration: newDuration, 
+        massage: newMassage, 
+        addon: "",
+        addonCount: "1",
+        people: updatedPeople 
+      };
     });
   };
 
   const handleMassageChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const val = e.target.value;
+    const isScalpIncluded = val === "Back & Scalp" || val === "Face & Scalp";
+
     setFormData(prev => ({
       ...prev, 
       massage: val, 
-      addon: "",
-      people: val === "Duo Treatment Massage" ? "2" : prev.people 
+      addon: isScalpIncluded ? "" : prev.addon,
+      addonCount: isScalpIncluded ? "0" : prev.addonCount
     }));
   };
 
+  const handlePeopleChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const newPeople = e.target.value;
+    const newPeopleNum = parseInt(newPeople, 10) || 1;
+
+    setFormData(prev => {
+      const currentAddonCount = parseInt(prev.addonCount, 10) || 1;
+      return {
+        ...prev,
+        people: newPeople,
+        addonCount: currentAddonCount > newPeopleNum ? newPeople : prev.addonCount
+      };
+    });
+  };
+
   const totalPrice = calculateTotal();
+  const minGuests = getMinGuests(formData.duration);
+  const totalGuests = parseInt(formData.people, 10) || minGuests;
+  const isScalpIncluded = formData.massage === "Back & Scalp" || formData.massage === "Face & Scalp";
 
   return (
     <main className="min-h-screen bg-[#5A4A42] py-24 px-6 flex flex-col items-center justify-center font-sans selection:bg-[#C4A052] selection:text-white">
       <div className="max-w-4xl w-full mb-8">
-        <Link href="/" className="text-[#C4A052] uppercase tracking-widest text-xs font-semibold hover:text-[#FDFBF7] transition-colors flex items-center gap-2 w-fit">
+        <Link href="/MichelleAirbnb" className="text-[#C4A052] uppercase tracking-widest text-xs font-semibold hover:text-[#FDFBF7] transition-colors flex items-center gap-2 w-fit">
           ← Back to Home
         </Link>
       </div>
@@ -159,16 +175,9 @@ export default function BookingPage() {
           <h1 className="text-3xl font-serif mb-6 uppercase tracking-widest text-[#C4A052]">Reserve</h1>
           
           <p className="text-sm font-light leading-relaxed mb-4 opacity-90">
-            Our therapists bring the spa experience to your doorstep in Limerick.
+            Our therapists bring the spa experience to the next level in Limerick.
           </p>
           
-          <div className="mb-8 p-4 bg-[#C4A052]/10 border border-[#C4A052]/20 rounded-sm">
-            <p className="text-sm font-light leading-relaxed text-[#FDFBF7]">
-              Mobile treatments within 10km. <br className="hidden lg:block md:hidden sm:block"/>
-              <span className="text-[#C4A052] font-medium">Duo, Trio booking or more available up to 30km.</span>
-            </p>
-          </div>
-
           <div className="space-y-4 text-xs tracking-wider font-light">
             <p>Limerick, Ireland</p>
             <p>maisonceleste@outlook.ie</p>
@@ -191,15 +200,22 @@ export default function BookingPage() {
           ) : (
             <form onSubmit={handleSubmit} className="space-y-6">
               
-              {/* ... All your input fields remain exactly the same ... */}
-              
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <input type="text" placeholder="Full Name" className="w-full border-b py-2 outline-none bg-transparent" value={formData.name} onChange={(e) => setFormData({...formData, name: e.target.value})} />
-                <input type="email" placeholder="Email" className="w-full border-b py-2 outline-none bg-transparent" value={formData.email} onChange={(e) => setFormData({...formData, email: e.target.value})} />
+                <input type="text" placeholder="Full Name" className="w-full border-b py-2 outline-none bg-transparent text-[#5A4A42]" value={formData.name} onChange={(e) => setFormData({...formData, name: e.target.value})} />
+                <input type="email" placeholder="Email" className="w-full border-b py-2 outline-none bg-transparent text-[#5A4A42]" value={formData.email} onChange={(e) => setFormData({...formData, email: e.target.value})} />
               </div>
               
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <input type="text" placeholder="Address (Eircode/Limerick)" className="w-full border-b py-2 outline-none bg-transparent" value={formData.address} onChange={(e) => setFormData({...formData, address: e.target.value})} />
+                <div>
+                  <label className="block text-[10px] uppercase tracking-widest text-[#5A4A42] mb-1 opacity-50">Location</label>
+                  <input 
+                    type="text" 
+                    value="Mount Eagle" 
+                    disabled 
+                    readOnly 
+                    className="w-full border-b py-2 outline-none bg-transparent text-[#5A4A42]/40 cursor-not-allowed select-none font-medium" 
+                  />
+                </div>
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -222,10 +238,9 @@ export default function BookingPage() {
                     onChange={handleDurationChange}
                   >
                     <option value="">Select Duration</option>
-                    <option value="45">45 Minutes (€{BASE_PRICES["45"]})</option>
-                    <option value="70">70 Minutes (€{BASE_PRICES["70"]})</option>
-                    <option value="90">90 Minutes (€{BASE_PRICES["90"]})</option>
-                    <option value="120">120 Minutes (€{BASE_PRICES["120"]})</option>
+                    <option value="30">The Essential Ritual - 30 Minutes (€{BASE_PRICES["30"]})</option>
+                    <option value="45">The Reset - 45 Minutes (€{BASE_PRICES["45"]})</option>
+                    <option value="70">The Ultimate Experience - 70 Minutes (€{BASE_PRICES["70"]})</option>
                   </select>
                   {errors.duration && <p className="text-red-500 text-[10px] mt-1 flex items-center gap-1"><AlertCircle className="w-3 h-3"/> {errors.duration}</p>}
                 </div>
@@ -234,50 +249,85 @@ export default function BookingPage() {
               {formData.duration && (
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6 animate-in fade-in slide-in-from-top-2 duration-300">
                   <div>
-                    <label className="block text-[10px] uppercase tracking-widest text-[#5A4A42] mb-2 font-semibold">Choose Massage</label>
-                    <select 
+                    <label className="block text-[10px] uppercase tracking-widest text-[#5A4A42] mb-2 font-semibold">
+                      Choose Massage
+                    </label>
+                    <select
                       className={`w-full border-b ${errors.massage ? 'border-red-400' : 'border-[#5A4A42]/20'} py-2 focus:border-[#C4A052] outline-none text-sm bg-transparent text-[#5A4A42] cursor-pointer`}
                       value={formData.massage}
                       onChange={handleMassageChange}
                     >
-                      {formData.duration === "45" ? (
-                        <option value="Back, Neck and Shoulders">Back, Neck and Shoulders</option>
+                      {formData.duration === "30" ? (
+                        <option value="Back, Neck & Shoulders">Back, Neck & Shoulders</option>
+                      ) : formData.duration === "45" ? (
+                        <>
+                          <option value="">Select Ritual...</option>
+                          <option value="Back & Scalp">Back & Scalp</option>
+                          <option value="Back & Legs">Back & Legs</option>
+                          <option value="Face & Scalp">Face & Scalp</option>
+                        </>
                       ) : (
                         <>
                           <option value="">Select Ritual...</option>
-                          {formData.duration !== "120" && (
-                            <option value="Back, Neck and Shoulders">Back, Neck and Shoulders</option>
-                          )}
-                          <option value="Japanese Face Lift">Japanese Face Lift</option>
+                          <option value="Deep Tissue">Deep Tissue</option>
                           <option value="Swedish Massage">Swedish Massage</option>
-                          <option value="Deep Tissue Massage">Deep Tissue Massage</option>
                           <option value="Californian Massage">Californian Massage</option>
                           <option value="Oriental Massage">Oriental Massage</option>
-                          <option value="Lymphatic Massage">Lymphatic Massage</option>
-                          <option value="Duo Treatment Massage">Duo Treatment Massage</option>
                         </>
                       )}
                     </select>
-                    {errors.massage && <p className="text-red-500 text-[10px] mt-1 flex items-center gap-1"><AlertCircle className="w-3 h-3"/> {errors.massage}</p>}
+                    {errors.massage && (
+                      <p className="text-red-500 text-[10px] mt-1 flex items-center gap-1">
+                        <AlertCircle className="w-3 h-3" /> {errors.massage}
+                      </p>
+                    )}
                   </div>
 
-                  {formData.massage && (
-                    <div className="animate-in fade-in slide-in-from-top-2 duration-300">
-                      <label className="block text-[10px] uppercase tracking-widest text-[#C4A052] mb-2 font-semibold font-semibold">Enhance Ritual (+€{ADDON_PRICE})</label>
-                      <select 
-                        className="w-full border-b border-[#5A4A42]/20 py-2 focus:border-[#C4A052] outline-none text-sm bg-transparent text-[#5A4A42] cursor-pointer"
-                        value={formData.addon}
-                        onChange={(e) => setFormData({...formData, addon: e.target.value})}
-                      >
-                        <option value="">No Add-on needed</option>
-                        <option value="Scalp Massage">Scalp Massage (+25 Mins)</option>
-                      </select>
+                  {formData.massage && !isScalpIncluded && (
+                    <div className="space-y-4 animate-in fade-in slide-in-from-top-2 duration-300">
+                      <div>
+                        <label className="block text-[10px] uppercase tracking-widest text-[#C4A052] mb-2 font-semibold">
+                          Enhance Ritual (+€{ADDON_PRICE}/person)
+                        </label>
+                        <select
+                          className="w-full border-b border-[#5A4A42]/20 py-2 focus:border-[#C4A052] outline-none text-sm bg-transparent text-[#5A4A42] cursor-pointer"
+                          value={formData.addon}
+                          onChange={(e) => {
+                            const value = e.target.value;
+                            setFormData({ 
+                              ...formData, 
+                              addon: value,
+                              addonCount: value ? (formData.addonCount || "1") : "0"
+                            });
+                          }}
+                        >
+                          <option value="">No Add-on needed</option>
+                          <option value="Scalp Massage">Scalp Massage (+10 Mins)</option>
+                        </select>
+                      </div>
+
+                      {formData.addon && (
+                        <div className="animate-in fade-in slide-in-from-top-2 duration-300">
+                          <label className="block text-[10px] uppercase tracking-widest text-[#5A4A42] mb-2 font-semibold">
+                            Guests Receiving Scalp Add-on
+                          </label>
+                          <select
+                            className="w-full border-b border-[#5A4A42]/20 py-2 focus:border-[#C4A052] outline-none text-sm bg-transparent text-[#5A4A42] cursor-pointer"
+                            value={formData.addonCount}
+                            onChange={(e) => setFormData({ ...formData, addonCount: e.target.value })}
+                          >
+                            {Array.from({ length: totalGuests }, (_, i) => i + 1).map((num) => (
+                              <option key={num} value={num.toString()}>
+                                {num} {num === 1 ? "Guest" : "Guests"} (+€{ADDON_PRICE * num})
+                              </option>
+                            ))}
+                          </select>
+                        </div>
+                      )}
                     </div>
                   )}
                 </div>
               )}
-
-              
 
               <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                 <div>
@@ -293,17 +343,23 @@ export default function BookingPage() {
                 </div>
                 
                 <div>
-                   <label className="block text-[10px] uppercase tracking-widest text-[#5A4A42] mb-1 opacity-50">Guests</label>
-                   <select className="w-full border-b py-2 outline-none bg-transparent cursor-pointer" value={formData.people} onChange={(e) => setFormData({...formData, people: e.target.value})}>
-                    <option value="1">1 Person</option>
-                    <option value="2">2 People</option>
-                    <option value="3">3 People</option>
+                  <label className="block text-[10px] uppercase tracking-widest text-[#5A4A42] mb-1 opacity-50">Guests</label>
+                  <select 
+                    className="w-full border-b py-2 outline-none bg-transparent cursor-pointer text-[#5A4A42]" 
+                    value={formData.people} 
+                    onChange={handlePeopleChange}
+                  >
+                    {Array.from({ length: 30 - minGuests + 1 }, (_, i) => minGuests + i).map((num) => (
+                      <option key={num} value={num}>
+                        {num} People
+                      </option>
+                    ))}
                   </select>
                 </div>
 
                 <div>
                   <label className="block text-[10px] uppercase tracking-widest text-[#5A4A42] mb-1 opacity-50">Preference</label>
-                  <select className="w-full border-b py-2 outline-none bg-transparent cursor-pointer" value={formData.time} onChange={(e) => setFormData({...formData, time: e.target.value})}>
+                  <select className="w-full border-b py-2 outline-none bg-transparent cursor-pointer text-[#5A4A42]" value={formData.time} onChange={(e) => setFormData({...formData, time: e.target.value})}>
                     <option value="">Time...</option>
                     <option value="morning">Morning</option>
                     <option value="afternoon">Afternoon</option>
@@ -318,7 +374,10 @@ export default function BookingPage() {
                   <div>
                     <h3 className="text-xs uppercase tracking-widest text-[#5A4A42]/60 font-semibold">Estimated Total</h3>
                     <p className="text-[10px] text-[#5A4A42]/40 font-light mt-0.5">
-                      {formData.massage === "Duo Treatment Massage" ? "Duo Booking" : `${formData.people} ${parseInt(formData.people) === 1 ? 'guest' : 'guests'}`} × {formData.duration} Mins {formData.addon && "+ add-on"}
+                      {formData.people} guests × {formData.duration} Mins
+                      {formData.addon && parseInt(formData.addonCount, 10) > 0 && (
+                        <> + {formData.addonCount} scalp massage{parseInt(formData.addonCount, 10) > 1 ? "s" : ""}</>
+                      )}
                     </p>
                   </div>
                   <div className="text-2xl font-serif text-[#5A4A42] flex items-center gap-0.5">
@@ -328,7 +387,6 @@ export default function BookingPage() {
                 </div>
               )}
 
-              {/* NEW: Inline Server Error Display */}
               {serverError && (
                 <div className="mt-6 p-4 bg-red-50 border border-red-200 rounded-sm flex items-start gap-3 animate-in fade-in duration-300">
                   <AlertCircle className="w-5 h-5 text-red-500 shrink-0 mt-0.5" />
@@ -341,7 +399,7 @@ export default function BookingPage() {
               <button 
                 type="submit"
                 disabled={isSubmitting}
-                className="w-full mt-6 bg-[#C4A052] text-white py-4 uppercase tracking-[0.2em] text-xs font-semibold hover:bg-[#5A4A42] transition-all duration-300 disabled:opacity-50"
+                className="w-full mt-[#6] bg-[#C4A052] text-white py-4 uppercase tracking-[0.2em] text-xs font-semibold hover:bg-[#5A4A42] transition-all duration-300 disabled:opacity-50"
               >
                 {isSubmitting ? "Verifying Details..." : "Submit Request"}
               </button>
