@@ -59,7 +59,7 @@ const details = [
 const sliderImages = [
   "/images/OilTray1.jpg",
   "/images/Photoshoot2.jpg",
-  "/images/Photoshoot3.jpg",
+  "/images/PhotoShoot3.jpg",
   "/images/OilTray2.jpg",
   "/images/OilTray3.jpg",
 ];
