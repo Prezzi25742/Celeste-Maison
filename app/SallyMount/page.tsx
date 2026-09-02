@@ -18,7 +18,7 @@ const packages = [
   {
     title: "The Essential Ritual",
     prices: ["€55 - per person"],
-    desc: "30-minute hands-on treatment, perfect for larger groups. Designed for groups of 10 guests or more.",
+    desc: "30-minute hands-on treatment, perfect for larger groups. Designed for groups of 6 guests or more.",
   },
   {
     title: "The Reset",
@@ -27,8 +27,8 @@ const packages = [
   },
   {
     title: "The Ultimate Ritual",
-    prices: ["€110 per person"],
-    desc: "70-minute full-body massage with your choice of: Deep Tissue, Swedish, Oriental, Californian. Designed for groups of 4 guests or more.",
+    prices: ["€110 - per person"],
+    desc: "70-minute Bespoke Full-Body Massage. A fully personalized massage, intuitvely designed around your body's needs on the day. Your therapist will combine dofferent techniques tailored specifically to you. Designed for groups of 2 guests or more.",
   },
 ];
 
