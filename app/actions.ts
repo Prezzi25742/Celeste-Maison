@@ -93,8 +93,7 @@ export async function handleBookingForm(data: BookingData) {
     }
 
     const parsedAddonCount = data.addon ? (parseInt(data.addonCount, 10) || 1) : null;
-
-    const supabase = await createClient();
+const supabase = await createClient();
     const { error: dbError } = await supabase
       .from('bookings')
       .insert([
@@ -104,18 +103,18 @@ export async function handleBookingForm(data: BookingData) {
           phone: data.phone,
           address: data.address,
           ritual: data.massage,
-          duration: parseInt(data.duration, 10),
+          duration: data.duration,              // Fixed: Sent as string (text)
           booking_date: dbDate,
           time_pref: data.time,
-          people: parseInt(data.people, 10),
+          people: data.people,                  // Fixed: Sent as string (text)
           addon: data.addon || null,
-          addon_count: parsedAddonCount
+          addonCount: parsedAddonCount          // Fixed: Matches exact column name
         }
       ]);
 
     if (dbError) {
-      console.error("Supabase Error:", dbError);
-      return { success: false, error: "Database save failed" };
+      console.error("Supabase Error Details:", dbError); // Temporary detailed error logging
+      return { success: false, error: `DB Error: ${dbError.message}` };
     }
 
     // ==========================================

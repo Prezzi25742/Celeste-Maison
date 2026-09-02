@@ -59,6 +59,8 @@ const details = [
 const sliderImages = [
   "/images/OilTray1.jpg",
   "/images/Photoshoot2.jpg",
+  "/images/Photoshoot3.jpg",
+  "/images/OilTray2.jpg",
   "/images/OilTray3.jpg",
 ];
 
@@ -114,7 +116,7 @@ const [lightboxImage, setLightboxImage] = useState<string | null>(null);
 
         <div className="flex justify-center mb-10">
           <a
-             href="MichelleAirbnb/booking"
+             href="PatriotBar/booking"
             target="_blank"
             rel="noopener noreferrer"
             onMouseEnter={() => setHeroCtaHovered(true)}
@@ -137,11 +139,11 @@ const [lightboxImage, setLightboxImage] = useState<string | null>(null);
           className="max-w-[540px] text-[15px] leading-[1.95] font-light"
           style={{ color: BROWN, opacity: 0.78 }}
         >
-          Your Moment of Relaxation.
+          Relax. Reset. Enjoy.
           <br /><br />
-          Take a little time for yourself during your stay at Mount Eagle.
+          Turn your visit to The Patriot Bar into a complete experience with the realxing massage.
           <br /><br />
-          Enjoy a professional massage in the comfort and privacy of your accommodation, tailored to help you relax, release tension and recharge.
+          Whether you're looking to unwind release tension or simply treat yourslef, choose your treatment and book your massage.
         </p>
 
         <span
@@ -425,7 +427,7 @@ const [lightboxImage, setLightboxImage] = useState<string | null>(null);
           ))}
 
           <div className="py-6 text-center text-xs tracking-wider uppercase font-light" style={{ borderTop: "1px solid rgba(41,21,7,0.13)", color: BROWN, opacity: 0.7 }}>
-            All treatments are provided in the comfort of Mount Eagle.
+            All treatments are provided in the comfort of The Patriot Bar.
           </div>
 
           <div style={{ borderTop: "1px solid rgba(41,21,7,0.13)" }} />
@@ -488,7 +490,7 @@ const [lightboxImage, setLightboxImage] = useState<string | null>(null);
           Ready to Elevate Your Stay?
         </h2>
         <a
-          href="MichelleAirbnb/booking"
+          href="PatriotBar/booking"
           target="_blank"
           rel="noopener noreferrer"
           onMouseEnter={() => setFooterCtaHovered(true)}

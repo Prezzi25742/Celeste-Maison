@@ -165,7 +165,7 @@ export default function BookingPage() {
   return (
     <main className="min-h-screen bg-[#5A4A42] py-24 px-6 flex flex-col items-center justify-center font-sans selection:bg-[#C4A052] selection:text-white">
       <div className="max-w-4xl w-full mb-8">
-        <Link href="/MichelleAirbnb" className="text-[#C4A052] uppercase tracking-widest text-xs font-semibold hover:text-[#FDFBF7] transition-colors flex items-center gap-2 w-fit">
+        <Link href="/PatriotBar" className="text-[#C4A052] uppercase tracking-widest text-xs font-semibold hover:text-[#FDFBF7] transition-colors flex items-center gap-2 w-fit">
           ← Back to Home
         </Link>
       </div>
@@ -210,7 +210,7 @@ export default function BookingPage() {
                   <label className="block text-[10px] uppercase tracking-widest text-[#5A4A42] mb-1 opacity-50">Location</label>
                   <input 
                     type="text" 
-                    value="Mount Eagle" 
+                    value="Sally Mount" 
                     disabled 
                     readOnly 
                     className="w-full border-b py-2 outline-none bg-transparent text-[#5A4A42]/40 cursor-not-allowed select-none font-medium" 
